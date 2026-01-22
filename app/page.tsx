@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback, Suspense, lazy } from "react"
+import { useRouter } from "next/navigation"
 import { Progress } from "@/components/ui/progress"
 import { Gift, Trophy, Clock, Target, Brain } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -38,6 +39,7 @@ const phases = [
 ]
 
 export default function KnapsackExperiment() {
+  const router = useRouter()
   const [currentPhase, setCurrentPhase] = useState("intro")
   const [participantId, setParticipantId] = useState<string | null>(null)
   const [participantData, setParticipantData] = useState({
@@ -65,9 +67,9 @@ export default function KnapsackExperiment() {
     // Check for Prolific parameters - REQUIRED for access
     const urlParams = new URLSearchParams(window.location.search)
     const prolificPid = urlParams.get('PROLIFIC_PID')
-    const studyId = urlParams.get('STUDY_ID') 
+    const studyId = urlParams.get('STUDY_ID')
     const sessionId = urlParams.get('SESSION_ID')
-    
+
     // DEBUG: Log parameters to help troubleshoot
     console.log('[Access Check] Prolific Parameters:', {
       prolificPid,
@@ -76,11 +78,11 @@ export default function KnapsackExperiment() {
       fullURL: window.location.href,
       searchParams: window.location.search
     })
-    
+
     // Set Prolific parameters
     setProlificParams({
       prolificPid,
-      studyId, 
+      studyId,
       sessionId,
     })
 
@@ -103,22 +105,27 @@ export default function KnapsackExperiment() {
       return
     }
     */
-    
+
     // TEST MODE: Allow access without Prolific parameters
     console.log('[TEST MODE] Access allowed for everyone')
-    
-    // If no Prolific params, create a test participant
+
+    // If no Prolific params, check for existing session or redirect to auth
     if (!prolificPid || !studyId || !sessionId) {
-      console.log('[TEST MODE] No Prolific params, creating test participant')
-      const testId = window.crypto.randomUUID()
-      setParticipantId(testId)
-      localStorage.setItem('participantId', testId)
-      localStorage.setItem('prolificPid', `test-${testId}`)
-      setAccessAllowed(true)
-      setIsCheckingAccess(false)
+      const storedParticipantId = localStorage.getItem('participantId')
+
+      if (storedParticipantId) {
+        console.log('[Auth] Found existing participant session')
+        setParticipantId(storedParticipantId)
+        setAccessAllowed(true)
+        setIsCheckingAccess(false)
+        return
+      }
+
+      console.log('[Auth] No session found, redirecting to login')
+      router.push('/auth')
       return
     }
-    
+
     console.log('[Access Check] Parameters valid, proceeding with registration...')
 
     // TEMPORARILY DISABLED FOR TESTING: Always verify with backend first to prevent duplicate participants
@@ -144,7 +151,7 @@ export default function KnapsackExperiment() {
         if (participantStatus.exists && !participantStatus.completed && participantStatus.participantId) {
           // Use backend's participantId (always authoritative)
           const backendParticipantId = participantStatus.participantId
-          
+
           // Check if cached participantId matches backend
           const cachedParticipantId = localStorage.getItem('participantId')
           if (cachedParticipantId !== backendParticipantId) {
@@ -153,7 +160,7 @@ export default function KnapsackExperiment() {
             localStorage.removeItem('participantId')
             localStorage.removeItem('prolificPid')
           }
-          
+
           setParticipantId(backendParticipantId)
           localStorage.setItem('participantId', backendParticipantId)
           localStorage.setItem('prolificPid', prolificPid)
@@ -168,11 +175,11 @@ export default function KnapsackExperiment() {
             .then((data) => {
               if (cancelled) return
               const id = data.participantId
-              
+
               // Clear any old cached data before setting new
               localStorage.removeItem('participantId')
               localStorage.removeItem('prolificPid')
-              
+
               setParticipantId(id)
               localStorage.setItem('participantId', id)
               localStorage.setItem('prolificPid', prolificPid)
@@ -182,7 +189,7 @@ export default function KnapsackExperiment() {
             .catch((registerError: any) => {
               if (cancelled) return
               console.error('[Registration Error]', registerError)
-              
+
               // If registration fails, try checking again (might have been created by another request)
               return api.checkParticipant(prolificPid)
                 .then((retryStatus) => {
@@ -206,9 +213,9 @@ export default function KnapsackExperiment() {
       })
       .catch((error) => {
         if (cancelled) return
-        
+
         console.error('[Check Participant Error]', error)
-        
+
         if (error.message?.includes('already completed')) {
           setShowCompletedMessage(true)
         }
@@ -220,14 +227,14 @@ export default function KnapsackExperiment() {
       cancelled = true
     }
   }, [])
-  
+
 
   // Memoize expensive calculations
   const currentPhaseIndex = useMemo(
     () => phases.findIndex((p) => p.id === currentPhase),
     [currentPhase]
   )
-  
+
   const progress = useMemo(
     () => ((currentPhaseIndex + 1) / phases.length) * 100,
     [currentPhaseIndex]
@@ -251,10 +258,10 @@ export default function KnapsackExperiment() {
       } catch (error) {
         console.error("[Completion] Failed to mark participant as completed:", error)
       }
-      
+
       localStorage.removeItem('participantId')
       localStorage.removeItem('prolificPid')
-      
+
       window.location.href = `https://app.prolific.co/submissions/complete?cc=KNAPSACK2024`
     }
   }, [prolificParams.prolificPid, participantId])
@@ -423,8 +430,8 @@ export default function KnapsackExperiment() {
               const isCompleted = index < currentPhaseIndex
 
               return (
-                <motion.div 
-                  key={phase.id} 
+                <motion.div
+                  key={phase.id}
                   className="flex flex-col items-center"
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.2 }}
@@ -432,12 +439,12 @@ export default function KnapsackExperiment() {
                   <div
                     className={`
                     w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300
-                    ${isActive 
-                      ? "bg-gradient-to-br from-blue-500 to-purple-600 ring-4 ring-blue-200" 
-                      : isCompleted 
-                        ? "bg-gradient-to-br from-green-500 to-emerald-600" 
-                        : "bg-gray-300"
-                    }
+                    ${isActive
+                        ? "bg-gradient-to-br from-blue-500 to-purple-600 ring-4 ring-blue-200"
+                        : isCompleted
+                          ? "bg-gradient-to-br from-green-500 to-emerald-600"
+                          : "bg-gray-300"
+                      }
                   `}
                   >
                     {isCompleted ? <Trophy className="h-6 w-6" /> : <Icon className="h-6 w-6" />}
@@ -445,12 +452,12 @@ export default function KnapsackExperiment() {
                   <span
                     className={`
                     text-xs mt-2 text-center font-medium px-2 py-1 rounded-full
-                    ${isActive 
-                      ? "text-blue-900 bg-blue-100" 
-                      : isCompleted 
-                        ? "text-green-900 bg-green-100"
-                        : "text-gray-600"
-                    }
+                    ${isActive
+                        ? "text-blue-900 bg-blue-100"
+                        : isCompleted
+                          ? "text-green-900 bg-green-100"
+                          : "text-gray-600"
+                      }
                   `}
                   >
                     {phase.name}

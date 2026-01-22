@@ -36,4 +36,17 @@ model Participant {
   
   @@index([prolificPid])
   @@index([participantId])
+  
+  // Email verification
+  email         String?   @unique
+}
+
+model EmailVerification {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([email])
 }

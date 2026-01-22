@@ -14,16 +14,16 @@ const pendingRequests = new Map<string, Promise<any>>()
 // Get API base URL (memoized)
 export const getApiBase = () => {
   if (typeof window === 'undefined') return 'http://localhost:8787'
-  return process.env.NEXT_PUBLIC_API_BASE || 
-         (process.env.NODE_ENV === 'production' 
-           ? "https://knapsack-expirement.onrender.com"
-           : "http://localhost:8787")
+  return process.env.NEXT_PUBLIC_API_BASE ||
+    (process.env.NODE_ENV === 'production'
+      ? "https://knapsack-expirement.onrender.com"
+      : "http://localhost:8787")
 }
 
 // Create axios instance with default config
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: getApiBase(),
-  timeout: 10000,
+  timeout: 90000, // 90 seconds to handle Render cold starts
   headers: {
     'Content-Type': 'application/json',
   },
@@ -121,34 +121,37 @@ export async function apiFetch<T = any>(
 export const api = {
   get: <T = any>(endpoint: string, useCache = true) =>
     apiFetch<T>(endpoint, { method: 'GET' }, useCache),
-  
+
   post: <T = any>(endpoint: string, body?: any) =>
     apiFetch<T>(endpoint, {
       method: 'POST',
       data: body,
     }, false),
-  
+
   put: <T = any>(endpoint: string, body?: any) =>
     apiFetch<T>(endpoint, {
       method: 'PUT',
       data: body,
     }, false),
-  
+
   delete: <T = any>(endpoint: string) =>
     apiFetch<T>(endpoint, { method: 'DELETE' }, false),
-  
+
   checkParticipant: (prolificPid: string) =>
     api.get<{ exists: boolean; completed: boolean; participantId?: string }>(
       `/api/v1/check-participant/${prolificPid}`,
       true // Cache participant checks for 5 minutes
     ),
-  
+
   registerProlific: (prolificPid: string, studyId: string, sessionId: string) =>
     api.post<{ participantId: string }>('/api/v1/register-prolific', {
       prolificPid,
       studyId,
       sessionId,
     }),
+
+  healthCheck: () =>
+    api.get<{ ok: boolean }>('/health', false),
 }
 
 // Export axios instance for advanced usage
