@@ -15,7 +15,7 @@ export const sendVerificationEmail = async (email: string, code: string) => {
 
     const msg = {
         to: email,
-        from: 'no-reply@onrender.com', // Change this to your verified sender
+        from: 'knapsack.exp@gmail.com', // MUST MATCH Verified Sender in SendGrid
         subject: 'Your Knapsack Experiment Verification Code',
         text: `Your verification code is: ${code}. It expires in 10 minutes.`,
         html: `<p>Your verification code is: <strong>${code}</strong></p><p>It expires in 10 minutes.</p>`,
