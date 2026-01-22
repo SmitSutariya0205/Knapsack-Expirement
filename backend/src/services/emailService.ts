@@ -14,6 +14,10 @@ const transporter = nodemailer.createTransport({
 
 export const sendVerificationEmail = async (email: string, code: string) => {
     // If no credentials, log to console (Dev mode)
+    console.log('[EMAIL DEBUG] Checking credentials...');
+    console.log(`[EMAIL DEBUG] User: ${process.env.SMTP_USER ? 'Present' : 'Missing'}`);
+    console.log(`[EMAIL DEBUG] Pass: ${process.env.SMTP_PASS ? 'Present' : 'Missing'}`);
+
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
         console.log(`[EMAIL DEV MODE] 📨 To: ${email} | Code: ${code}`);
         return true;
