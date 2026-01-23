@@ -16,7 +16,8 @@ app.use(cors({
     'http://localhost:3001',
     ...(process.env.CORS_ORIGIN?.split(',') ?? [])
   ],
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-key']
 }));
 app.use(express.json({ limit: '2mb' }));
 app.use(participantRoutes);
