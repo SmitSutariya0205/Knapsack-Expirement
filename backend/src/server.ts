@@ -11,6 +11,7 @@ const port = Number(process.env.PORT || 8787);
 app.use(cors({
   origin: [
     'https://arjav5090.github.io',
+    'https://smitsutariya0205.github.io',
     'http://localhost:3000',
     'http://localhost:3001',
     ...(process.env.CORS_ORIGIN?.split(',') ?? [])
