@@ -42,9 +42,9 @@ export default function AuthPage() {
             const response = await api.post<any>('/auth/verify-code', { email, code })
 
             if (response.success) {
-                // Store participant ID and redirect
-                localStorage.setItem('participantId', response.participantId)
-                localStorage.setItem('prolificPid', response.email) // Use email as PID for non-prolific users
+                // Store participant ID and redirect (Session only)
+                sessionStorage.setItem('participantId', response.participantId)
+                sessionStorage.setItem('prolificPid', response.email) // Use email as PID for non-prolific users
 
                 // Redirect to main experiment
                 router.push('/')

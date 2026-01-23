@@ -101,7 +101,7 @@ export default function KnapsackExperiment() {
       })
 
       // Fallback to internal auth if no prolific params
-      const storedParticipantId = localStorage.getItem('participantId')
+      const storedParticipantId = sessionStorage.getItem('participantId')
       if (storedParticipantId) {
         setParticipantId(storedParticipantId)
         setAccessAllowed(true)
@@ -147,17 +147,17 @@ export default function KnapsackExperiment() {
           const backendParticipantId = participantStatus.participantId
 
           // Check if cached participantId matches backend
-          const cachedParticipantId = localStorage.getItem('participantId')
+          const cachedParticipantId = sessionStorage.getItem('participantId')
           if (cachedParticipantId !== backendParticipantId) {
             // Mismatch: clear cache and use backend's ID
             console.warn(`[Participant Mismatch] Cached: ${cachedParticipantId}, Backend: ${backendParticipantId}. Using backend ID.`)
-            localStorage.removeItem('participantId')
-            localStorage.removeItem('prolificPid')
+            sessionStorage.removeItem('participantId')
+            sessionStorage.removeItem('prolificPid')
           }
 
           setParticipantId(backendParticipantId)
-          localStorage.setItem('participantId', backendParticipantId)
-          localStorage.setItem('prolificPid', prolificPid)
+          sessionStorage.setItem('participantId', backendParticipantId)
+          sessionStorage.setItem('prolificPid', prolificPid)
           setAccessAllowed(true)
           setIsCheckingAccess(false)
           return
@@ -171,12 +171,12 @@ export default function KnapsackExperiment() {
               const id = data.participantId
 
               // Clear any old cached data before setting new
-              localStorage.removeItem('participantId')
-              localStorage.removeItem('prolificPid')
+              sessionStorage.removeItem('participantId')
+              sessionStorage.removeItem('prolificPid')
 
               setParticipantId(id)
-              localStorage.setItem('participantId', id)
-              localStorage.setItem('prolificPid', prolificPid)
+              sessionStorage.setItem('participantId', id)
+              sessionStorage.setItem('prolificPid', prolificPid)
               setAccessAllowed(true)
               setIsCheckingAccess(false)
             })
@@ -190,8 +190,8 @@ export default function KnapsackExperiment() {
                   if (cancelled) return
                   if (retryStatus.exists && retryStatus.participantId) {
                     setParticipantId(retryStatus.participantId)
-                    localStorage.setItem('participantId', retryStatus.participantId)
-                    localStorage.setItem('prolificPid', prolificPid)
+                    sessionStorage.setItem('participantId', retryStatus.participantId)
+                    sessionStorage.setItem('prolificPid', prolificPid)
                     setAccessAllowed(true)
                     setIsCheckingAccess(false)
                   } else {
@@ -253,8 +253,8 @@ export default function KnapsackExperiment() {
         console.error("[Completion] Failed to mark participant as completed:", error)
       }
 
-      localStorage.removeItem('participantId')
-      localStorage.removeItem('prolificPid')
+      sessionStorage.removeItem('participantId')
+      sessionStorage.removeItem('prolificPid')
 
       window.location.href = `https://app.prolific.co/submissions/complete?cc=KNAPSACK2024`
     }
