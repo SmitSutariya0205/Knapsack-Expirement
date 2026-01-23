@@ -88,11 +88,10 @@ export default function KnapsackExperiment() {
 
     // TEMPORARILY DISABLED FOR TESTING: Access restriction removed
     // TODO: Re-enable before production launch
-    /*
     // SECURITY: Only allow access with valid Prolific parameters
     // Check if parameters are template variables (not replaced by Prolific)
     const hasTemplateVariables = prolificPid?.includes('{{') || studyId?.includes('{{') || sessionId?.includes('{{')
-    
+
     if (!prolificPid || !studyId || !sessionId || hasTemplateVariables) {
       console.error('[Access Denied] Invalid or missing parameters:', {
         hasTemplateVariables,
@@ -100,21 +99,10 @@ export default function KnapsackExperiment() {
         studyId: studyId || 'MISSING',
         sessionId: sessionId || 'MISSING'
       })
-      setAccessAllowed(false)
-      setIsCheckingAccess(false)
-      return
-    }
-    */
 
-    // TEST MODE: Allow access without Prolific parameters
-    console.log('[TEST MODE] Access allowed for everyone')
-
-    // If no Prolific params, check for existing session or redirect to auth
-    if (!prolificPid || !studyId || !sessionId) {
+      // Fallback to internal auth if no prolific params
       const storedParticipantId = localStorage.getItem('participantId')
-
       if (storedParticipantId) {
-        console.log('[Auth] Found existing participant session')
         setParticipantId(storedParticipantId)
         setAccessAllowed(true)
         setIsCheckingAccess(false)
@@ -125,6 +113,12 @@ export default function KnapsackExperiment() {
       router.push('/auth')
       return
     }
+
+    /*
+    // TEST MODE: Allow access without Prolific parameters
+    console.log('[TEST MODE] Access allowed for everyone')
+    */
+
 
     console.log('[Access Check] Parameters valid, proceeding with registration...')
 
