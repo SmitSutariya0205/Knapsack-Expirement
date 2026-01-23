@@ -103,6 +103,10 @@ export default function AuthPage() {
                         <form onSubmit={handleVerifyCode} className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="code">Verification Code</Label>
+                                <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded border border-amber-200 mb-2">
+                                    <strong>Check your Spam/Junk folder!</strong><br />
+                                    The email often lands there.
+                                </div>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                     <Input
