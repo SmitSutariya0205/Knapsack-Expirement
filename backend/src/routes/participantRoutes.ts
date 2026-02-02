@@ -19,6 +19,7 @@ interface Participant {
   testStrategy: any
   testFinal: any
   timeTracking: any
+  email: string | null
 }
 
 export const router = express.Router()
@@ -587,9 +588,7 @@ const adminAuth = (req: any, res: any, next: any) => {
 router.get('/api/v1/admin/export-csv', adminAuth, async (req, res) => {
   try {
     const participants = await prisma.participant.findMany({
-      where: {
-        prolificPid: { not: null }
-      },
+      where: {},
       orderBy: {
         createdAt: 'desc'
       }
@@ -686,8 +685,8 @@ router.get('/api/v1/admin/export-csv', adminAuth, async (req, res) => {
 router.get('/api/v1/admin/analytics', adminAuth, async (req, res) => {
   try {
     const participants = await prisma.participant.findMany({
-      where: {
-        prolificPid: { not: null }
+      orderBy: {
+        createdAt: 'desc'
       }
     })
 
@@ -726,6 +725,7 @@ router.get('/api/v1/admin/analytics', adminAuth, async (req, res) => {
         return {
           participantId: p.participantId,
           prolificPid: p.prolificPid,
+          email: p.email,
           registeredAt: p.registeredAt,
           completedAt: p.completedAt,
           totalStudyTime: timeTracking.totalStudyTime || 0,

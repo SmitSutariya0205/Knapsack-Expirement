@@ -51,6 +51,7 @@ interface AnalyticsData {
   participantDetails: Array<{
     participantId: string
     prolificPid: string
+    email?: string
     registeredAt: string
     completedAt?: string
     totalStudyTime: number
@@ -313,7 +314,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left p-2">Prolific ID</th>
+                        <th className="text-left p-2">ID / Email</th>
                         <th className="text-left p-2">Registered</th>
                         <th className="text-left p-2">Status</th>
 
@@ -323,7 +324,9 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
                     <tbody>
                       {analytics.participantDetails.map((participant) => (
                         <tr key={participant.participantId} className="border-b hover:bg-gray-50">
-                          <td className="p-2 font-mono text-xs">{participant.prolificPid}</td>
+                          <td className="p-2 font-mono text-xs">
+                            {participant.prolificPid || participant.email || participant.participantId.substring(0, 8)}
+                          </td>
                           <td className="p-2">{formatDate(participant.registeredAt)}</td>
                           <td className="p-2">
                             <Badge variant={participant.completedAt ? "default" : "secondary"}>
@@ -371,7 +374,9 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
                     </Button>
                   </div>
                   <p className="text-sm text-gray-600">
-                    Prolific ID: <code className="bg-gray-100 px-1 rounded">{participantDetails.participantInfo?.prolificPid}</code>
+                    ID: <code className="bg-gray-100 px-1 rounded">
+                      {participantDetails.participantInfo?.prolificPid || participantDetails.participantInfo?.email || participantDetails.participantInfo?.participantId}
+                    </code>
                   </p>
                 </CardHeader>
                 <CardContent>
