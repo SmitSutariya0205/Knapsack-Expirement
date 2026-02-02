@@ -272,7 +272,8 @@ export default function KnapsackExperiment() {
     onNext: nextPhase,
     participantData,
     updateParticipantData,
-  }), [nextPhase, participantData, updateParticipantData])
+    participantId,
+  }), [nextPhase, participantData, updateParticipantData, participantId])
 
   const renderPhase = useMemo(() => {
     switch (currentPhase) {

@@ -14,6 +14,7 @@ interface TrainingPhase2Props {
   onNext: () => void
   participantData: any
   updateParticipantData: (data: any) => void
+  participantId: string | null
 }
 
 const skillsQuestions = [
@@ -151,7 +152,7 @@ const skillsQuestions = [
   },
 ]
 
-export default function TrainingPhase2({ onNext, updateParticipantData }: TrainingPhase2Props) {
+export default function TrainingPhase2({ onNext, updateParticipantData, participantId }: TrainingPhase2Props) {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<
     Array<{ questionId: number; selected: number[]; correct: boolean; confirmed: boolean; timeSpent: number }>
@@ -196,7 +197,7 @@ export default function TrainingPhase2({ onNext, updateParticipantData }: Traini
     const endTime = Date.now()
     const timeSpent = endTime - questionStartTime
     const questionId = skillsQuestions[currentQuestion].id
-    
+
     // Log interaction
     timeTracker.logInteraction('answer_confirmed', {
       questionId,
@@ -257,14 +258,14 @@ export default function TrainingPhase2({ onNext, updateParticipantData }: Traini
     const correctCount = answers.filter((a) => a.correct).length
     const incorrectCount = answers.filter((a) => a.selected.length > 0 && !a.correct).length
     const unansweredCount = skillsQuestions.length - correctCount - incorrectCount
-    
+
     // Calculate total points: 2 points per correct, 1 point per unanswered, 0 per incorrect
     const totalPoints = (correctCount * 2) + (unansweredCount * 1) + (incorrectCount * 0)
     const maxPoints = skillsQuestions.length * 2 // 10 questions × 2 = 20 max points
 
     const payload = {
       phase: "skill",
-      participantId: localStorage.getItem("participantId"),
+      participantId: participantId,
       data: {
         completed: true,
         correctAnswers: correctCount,
@@ -285,28 +286,28 @@ export default function TrainingPhase2({ onNext, updateParticipantData }: Traini
       },
     }
 
-     try {
-       const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://knapsack-expirement.onrender.com"
-       
-       // Add timeout to prevent hanging
-       const controller = new AbortController()
-       const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://knapsack-expirement.onrender.com"
 
-       const res = await fetch(`${API_BASE}/api/v1/ingest-phase`, {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify(payload),
-         signal: controller.signal
-       })
+      // Add timeout to prevent hanging
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
 
-       clearTimeout(timeoutId)
+      const res = await fetch(`${API_BASE}/api/v1/ingest-phase`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      })
+
+      clearTimeout(timeoutId)
 
       if (!res.ok) {
         const text = await res.text()
         console.error("[Test 1] Server error:", res.status, text)
         throw new Error(`Failed to submit test data (status ${res.status})`)
       }
-      
+
       updateParticipantData({ training2: payload.data, totalScore: totalPoints })
       onNext()
     } catch (err) {
@@ -416,7 +417,7 @@ export default function TrainingPhase2({ onNext, updateParticipantData }: Traini
     const correctAnswers = answers.filter((a) => a.correct).length
     const unansweredQuestions = answers.filter((a) => a.selected.length === 0).length
     const incorrectAnswers = answers.filter((a) => a.selected.length > 0 && !a.correct).length
-    
+
     // Calculate points: 2 points per correct, 1 point per unanswered, 0 per incorrect
     const totalPoints = (correctAnswers * 2) + (unansweredQuestions * 1) + (incorrectAnswers * 0)
     const maxPoints = skillsQuestions.length * 2 // 20 max points
@@ -478,7 +479,7 @@ export default function TrainingPhase2({ onNext, updateParticipantData }: Traini
     )
   }
 
- 
+
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -490,7 +491,7 @@ export default function TrainingPhase2({ onNext, updateParticipantData }: Traini
                 Question {currentQuestion + 1} of {skillsQuestions.length}
               </span>
             </div>
-            
+
           </div>
           <Progress value={progress} className="h-2" />
         </CardContent>

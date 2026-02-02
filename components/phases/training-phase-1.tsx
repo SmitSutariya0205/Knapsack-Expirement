@@ -14,11 +14,12 @@ interface TrainingPhase1Props {
   onNext: () => void
   participantData: any
   updateParticipantData: (data: any) => void
+  participantId: string | null
 }
 
 // Questions will be loaded dynamically from the backend/generator
 
-export default function TrainingPhase1({ onNext, updateParticipantData }: TrainingPhase1Props) {
+export default function TrainingPhase1({ onNext, updateParticipantData, participantId }: TrainingPhase1Props) {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<Array<{ questionId: number; selected: number[]; correct: boolean; confirmed: boolean }>>([])
   const [showFeedback, setShowFeedback] = useState(false)
@@ -32,23 +33,8 @@ export default function TrainingPhase1({ onNext, updateParticipantData }: Traini
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true)
   const [questionLoadError, setQuestionLoadError] = useState<string | null>(null)
 
-  // 🔑 Load participantId from localStorage once
-  const [pid, setPid] = useState<string | null>(null)
-  useEffect(() => {
-    console.log("[Practice] Loading participant ID from localStorage")
-    try {
-      const stored = localStorage.getItem("participantId")
-      console.log("[Practice] Stored participant ID:", stored)
-      setPid(stored)
-      if (!stored) {
-        console.warn("[Practice] No participantId in localStorage. Did registration run on page load?")
-      } else {
-        console.log("[Practice] Set participant ID to:", stored)
-      }
-    } catch (e) {
-      console.error("[Practice] Failed to read participantId from localStorage", e)
-    }
-  }, [])
+  // Use the prop directly
+  const pid = participantId
 
   // 🔄 Load questions dynamically when participant ID is available
   useEffect(() => {
@@ -60,17 +46,17 @@ export default function TrainingPhase1({ onNext, updateParticipantData }: Traini
 
     const loadQuestions = () => {
       console.log("[Practice] Loading questions from static JSON")
-      
+
       try {
         setIsLoadingQuestions(true)
         setQuestionLoadError(null)
-        
+
         // Load practice questions from static JSON (instant, no API calls)
         const questions = getPracticeQuestions()
-        
+
         console.log("[Practice] Loaded static questions:", questions.length)
         setAllQuestions(questions)
-        
+
       } catch (error) {
         console.error("[Practice] Failed to load questions:", error)
         setQuestionLoadError(error instanceof Error ? error.message : 'Failed to load questions')
@@ -111,21 +97,21 @@ export default function TrainingPhase1({ onNext, updateParticipantData }: Traini
 
   const startExtraPractice = () => {
     if (!pid) return
-    
+
     try {
       setIsLoadingQuestions(true)
       setWantMorePractice(true)
       setIsExtraPractice(true)
-      
+
       // Load additional practice questions from static JSON
       const extraQuestions = getPracticeQuestions()
-      
+
       // Combine original questions with extra ones
       const combinedQuestions = [...allQuestions, ...extraQuestions]
       setAllQuestions(combinedQuestions)
       setCurrentQuestion(allQuestions.length) // Start from first extra question
       setWantMorePractice(null) // Back to questions
-      
+
     } catch (error) {
       console.error("[Practice] Failed to load extra questions:", error)
       // If extra question generation fails, just continue with existing questions
@@ -137,7 +123,7 @@ export default function TrainingPhase1({ onNext, updateParticipantData }: Traini
 
   const handleComplete = async () => {
     console.log("[Practice] handleComplete called")
-    
+
     if (!pid) {
       alert("Participant not registered yet. Please refresh the page so we can register your session.")
       console.error("[Practice] handleComplete aborted: no participantId")
@@ -461,7 +447,7 @@ export default function TrainingPhase1({ onNext, updateParticipantData }: Traini
               <Button onClick={nextQuestion} size="lg">
                 {currentQuestion === allQuestions.length - 1 ? "Complete Practice" : "Next Question"}
               </Button>
-              
+
               {isExtraPractice && currentQuestion >= 6 && (
                 <div>
                   <Button onClick={handleComplete} variant="outline" size="lg" className="ml-4">

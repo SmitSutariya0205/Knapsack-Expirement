@@ -14,11 +14,12 @@ interface BenchmarkPhaseProps {
   onNext: () => void
   participantData: any
   updateParticipantData: (data: any) => void
+  participantId: string | null
 }
 
 // Questions will be loaded dynamically from the backend/generator
 
-export default function BenchmarkPhase({ onNext, updateParticipantData }: BenchmarkPhaseProps) {
+export default function BenchmarkPhase({ onNext, updateParticipantData, participantId }: BenchmarkPhaseProps) {
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<{
@@ -30,23 +31,17 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
   const [isComplete, setIsComplete] = useState(false)
   const timeTracker = useTimeTracker()
   const [showFinishWarning, setShowFinishWarning] = useState(false)
-  const [questionTimes, setQuestionTimes] = useState<{[key: number]: {startTime: number, endTime?: number, timeSpent?: number}}>({})
+  const [questionTimes, setQuestionTimes] = useState<{ [key: number]: { startTime: number, endTime?: number, timeSpent?: number } }>({})
   const [currentQuestionStartTime, setCurrentQuestionStartTime] = useState<number | null>(null)
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true)
   const [questionLoadError, setQuestionLoadError] = useState<string | null>(null)
-  const [participantId, setParticipantId] = useState<string | null>(null)
+
 
   // API base
   const API_BASE = useMemo(() => process.env.NEXT_PUBLIC_API_BASE || "https://knapsack-expirement.onrender.com", [])
 
   // Load participant ID
-  useEffect(() => {
-    const stored = localStorage.getItem("participantId")
-    setParticipantId(stored)
-    if (!stored) {
-      console.warn("[Benchmark] No participantId in localStorage")
-    }
-  }, [])
+
 
   // Load questions from static JSON
   useEffect(() => {
@@ -56,10 +51,10 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
       try {
         setIsLoadingQuestions(true)
         setQuestionLoadError(null)
-        
+
         const generatedQuestions = getBenchmarkPhaseQuestions()
         setQuestions(generatedQuestions)
-        
+
       } catch (error) {
         console.error("[Benchmark] Failed to load questions:", error)
         setQuestionLoadError(error instanceof Error ? error.message : 'Failed to load questions')
@@ -75,7 +70,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
   useEffect(() => {
     if (!showInstructions && !isComplete) {
       timeTracker.startSection('benchmark')
-      
+
       return () => {
         timeTracker.endSection()
       }
@@ -102,15 +97,15 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
   // Complete test function
   const completeTest = async () => {
     setIsComplete(true)
-  
+
     const correctAnswers = Object.values(answers).filter((a) => a.confirmed && a.correct).length
     const incorrectAnswers = Object.values(answers).filter((a) => a.confirmed && !a.correct).length
     const confirmedAnswers = Object.values(answers).filter((a) => a.confirmed).length
     const unansweredQuestions = questions.length - confirmedAnswers
-    
+
     const totalPoints = (correctAnswers * 2) + (unansweredQuestions * 1) + (incorrectAnswers * 0)
     const maxPoints = questions.length * 2
-  
+
     const finalQuestionTimes = { ...questionTimes }
     if (currentQuestionStartTime !== null && questions[currentQuestion]) {
       const currentQuestionId = questions[currentQuestion].id
@@ -151,16 +146,16 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
         }))
       }
     }
-  
+
     try {
       const res = await fetch(`${API_BASE}/api/v1/ingest-phase`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-  
+
       if (!res.ok) throw new Error("Failed to submit benchmark test data")
-  
+
       updateParticipantData({
         benchmark: payload.data,
         totalScore: totalPoints,
@@ -197,7 +192,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
             }))
           }
         }
-        
+
         // Start timing for current question
         const startTime = Date.now()
         setCurrentQuestionStartTime(startTime)
@@ -209,10 +204,10 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
             timeSpent: undefined
           }
         }))
-        
+
         timeTracker.startQuestion(questionId, 'benchmark')
       }
-      
+
       return () => {
         timeTracker.endQuestion()
       }
@@ -223,7 +218,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
     const questionId = questions[currentQuestion].id
     const endTime = Date.now()
     const timeSpent = currentQuestionStartTime ? endTime - currentQuestionStartTime : 0
-    
+
     // Log interaction
     timeTracker.logInteraction('answer_confirmed', {
       questionId,
@@ -232,7 +227,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
       timeSpent,
       timestamp: new Date().toISOString()
     })
-    
+
     setAnswers((prev) => ({
       ...prev,
       [questionId]: {
@@ -247,7 +242,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
   const handleTimeUp = () => {
     completeTest()
   }
-  
+
 
   const toggleStar = (questionIndex: number) => {
     setStarredQuestions((prev) => {
@@ -276,7 +271,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
         }
       }))
     }
-    
+
     // Log navigation interaction
     timeTracker.logInteraction('question_navigation', {
       fromQuestion: currentQuestion,
@@ -284,7 +279,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
       timeSpent: currentQuestionStartTime ? Date.now() - currentQuestionStartTime : 0,
       timestamp: new Date().toISOString()
     })
-    
+
     setCurrentQuestion(index)
   }
 
@@ -450,9 +445,8 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <h2 className="text-2xl font-bold text-gray-900">Test 2</h2>
-              <div className={`px-4 py-3 rounded-xl text-xl font-mono font-bold shadow-lg flex items-center space-x-2 ${
-                timeLeft <= 300 ? "bg-red-500 text-white animate-pulse" : timeLeft <= 600 ? "bg-orange-500 text-white" : "bg-blue-500 text-white"
-              }`}>
+              <div className={`px-4 py-3 rounded-xl text-xl font-mono font-bold shadow-lg flex items-center space-x-2 ${timeLeft <= 300 ? "bg-red-500 text-white animate-pulse" : timeLeft <= 600 ? "bg-orange-500 text-white" : "bg-blue-500 text-white"
+                }`}>
                 <Clock className="h-5 w-5" />
                 <span>{formatTime(timeLeft)}</span>
               </div>
@@ -495,26 +489,24 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
                       onClick={() => navigateToQuestion(index)}
                       className={`
                         relative w-14 h-14 flex items-center justify-center font-bold text-lg rounded-xl transition-all duration-200 border-2
-                        ${
-                          isActive
-                            ? "bg-blue-500 text-white shadow-lg scale-110 border-blue-600"
-                            : isAnswered
-                              ? "bg-green-100 text-green-800 hover:bg-green-200 border-green-300"
-                              : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-300"
+                        ${isActive
+                          ? "bg-blue-500 text-white shadow-lg scale-110 border-blue-600"
+                          : isAnswered
+                            ? "bg-green-100 text-green-800 hover:bg-green-200 border-green-300"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-300"
                         }
                       `}
                     >
                       {index + 1}
                     </button>
-                    
+
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         toggleStar(index)
                       }}
-                      className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center ${
-                        isStarred ? "bg-yellow-500 text-white" : "bg-gray-200 text-gray-400 hover:bg-gray-300"
-                      }`}
+                      className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center ${isStarred ? "bg-yellow-500 text-white" : "bg-gray-200 text-gray-400 hover:bg-gray-300"
+                        }`}
                     >
                       <Star className="h-3 w-3" fill={isStarred ? "currentColor" : "none"} />
                     </button>
@@ -553,7 +545,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
 
       {/* Main Question Area */}
       <div className="space-y-6">
-          <Card>
+        <Card>
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -640,14 +632,14 @@ export default function BenchmarkPhase({ onNext, updateParticipantData }: Benchm
                 </p>
               </div>
               <div className="flex space-x-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setShowFinishWarning(false)}
                   className="flex-1"
                 >
                   Continue Test
                 </Button>
-                <Button 
+                <Button
                   onClick={() => {
                     setShowFinishWarning(false)
                     completeTest()
