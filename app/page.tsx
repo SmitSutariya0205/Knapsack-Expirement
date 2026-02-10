@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, useCallback, Suspense, lazy } from "react"
 import { useRouter } from "next/navigation"
 import { Progress } from "@/components/ui/progress"
-import { Gift, Trophy, Clock, Target, Brain } from "lucide-react"
+import { Gift, Trophy, Clock, Target, Brain, AlertCircle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { api } from "@/lib/api-client"
 
@@ -12,6 +12,7 @@ const IntroPhase = lazy(() => import("@/components/phases/intro-phase"))
 const TutorialPhase = lazy(() => import("@/components/phases/tutorial-phase"))
 const TrainingPhase1 = lazy(() => import("@/components/phases/training-phase-1"))
 const TrainingPhase2 = lazy(() => import("@/components/phases/training-phase-2"))
+const TransitionPhase = lazy(() => import("@/components/phases/transition-phase"))
 const BenchmarkPhase = lazy(() => import("@/components/phases/benchmark-phase"))
 const PredictionPhase = lazy(() => import("@/components/phases/prediction-phase"))
 const ResultsPhase = lazy(() => import("@/components/phases/results-phase"))
@@ -31,6 +32,7 @@ const phases = [
   { id: "tutorial", name: "Tutorial", icon: Brain, color: "bg-green-500" },
   { id: "training1", name: "Practice", icon: Target, color: "bg-yellow-500" },
   { id: "training2", name: "Test 1", icon: Clock, color: "bg-orange-500" },
+  { id: "transition", name: "Instructions", icon: AlertCircle, color: "bg-indigo-500" },
   { id: "benchmark", name: "Test 2", icon: Trophy, color: "bg-purple-500" },
   { id: "prediction", name: "Test 3", icon: Target, color: "bg-red-500" },
   { id: "results", name: "Results", icon: Gift, color: "bg-emerald-500" },
@@ -283,6 +285,8 @@ export default function KnapsackExperiment() {
         return <TrainingPhase1 {...phaseProps} />
       case "training2":
         return <TrainingPhase2 {...phaseProps} />
+      case "transition":
+        return <TransitionPhase onNext={nextPhase} />
       case "benchmark":
         return <BenchmarkPhase {...phaseProps} />
       case "prediction":
