@@ -198,6 +198,7 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
         totalPoints,
         maxPoints,
         totalQuestions: questions.length,
+        accuracy: correctAnswers / questions.length,
         timeUsed: 20 * 60 - timeLeft,
         answers: Object.entries(answers).map(([questionId, value]) => ({
           questionId: Number(questionId),
