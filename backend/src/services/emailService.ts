@@ -13,6 +13,10 @@ export const sendVerificationEmail = async (email: string, code: string) => {
         return true;
     }
 
+    // Log masked key for debugging
+    const key = process.env.SENDGRID_API_KEY;
+    console.log(`[EMAIL DEBUG] Using SendGrid Key: ${key.substring(0, 4)}...${key.substring(key.length - 4)}`);
+
     const msg = {
         to: email,
         from: 'knapsack.exp@gmail.com', // MUST MATCH Verified Sender in SendGrid
@@ -22,15 +26,27 @@ export const sendVerificationEmail = async (email: string, code: string) => {
     };
 
     try {
-        await sgMail.send(msg);
+        console.log(`[EMAIL] Attempting to send to ${email}...`);
+
+        // Add 10s timeout
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('SendGrid request timed out after 10s')), 10000)
+        );
+
+        await Promise.race([
+            sgMail.send(msg),
+            timeoutPromise
+        ]);
+
         console.log(`[EMAIL SENT] 📨 To: ${email} via SendGrid`);
         return true;
     } catch (error: any) {
-        console.error('[EMAIL ERROR] SendGrid failed:', error);
+        console.error('[EMAIL ERROR] SendGrid failed:', error.message);
         if (error.response) {
-            console.error(error.response.body);
+            console.error('[EMAIL ERROR BODY]', JSON.stringify(error.response.body, null, 2));
         }
-        // Fallback for dev mode continuity if valid key but other error (e.g. unverified sender)
+
+        // Fallback for dev mode continuity
         console.log(`[EMAIL FALLBACK] 📨 To: ${email} | Code: ${code}`);
         return false;
     }
