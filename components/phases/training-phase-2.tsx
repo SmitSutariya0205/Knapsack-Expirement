@@ -163,6 +163,7 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
   const [totalTimeLeft, setTotalTimeLeft] = useState(15 * 60)
   const [questionStartTime, setQuestionStartTime] = useState<number>(0)
   const [isComplete, setIsComplete] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const hasCompleted = useRef(false)
 
   // Total timer
@@ -287,6 +288,7 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
     }
 
     try {
+      setIsSaving(true)
       const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://knapsack-expirement.onrender.com"
 
       // Add timeout to prevent hanging
@@ -305,16 +307,18 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
       if (!res.ok) {
         const text = await res.text()
         console.error("[Test 1] Server error:", res.status, text)
-        throw new Error(`Failed to submit test data (status ${res.status})`)
+        // Even if server error, we proceed locally
       }
 
       updateParticipantData({ training2: payload.data, totalScore: totalPoints })
-      onNext()
+      // Do NOT call onNext() here. Just turn off saving loading state.
+      // The UI will now show the completion screen.
+      setIsSaving(false)
     } catch (err) {
       console.error("[Test 1] Failed to submit:", err)
       // Proceed with local data if backend unavailable
       updateParticipantData({ training2: payload.data, totalScore: totalPoints })
-      onNext()
+      setIsSaving(false)
     }
   }
 
@@ -479,7 +483,16 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
     )
   }
 
-
+  if (isSaving) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-orange-600 border-r-transparent mb-4"></div>
+          <p className="text-gray-600">Saving your results...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
