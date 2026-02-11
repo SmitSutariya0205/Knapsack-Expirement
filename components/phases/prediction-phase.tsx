@@ -29,7 +29,7 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
   }>({})
   const [starredQuestions, setStarredQuestions] = useState<Set<number>>(new Set())
   const [showInstructions, setShowInstructions] = useState(true)
-  const [timeLeft, setTimeLeft] = useState(20 * 60) // 20 minutes
+  const [timeLeft, setTimeLeft] = useState(15 * 60) // 15 minutes
   const [isComplete, setIsComplete] = useState(false)
   const [showFinishWarning, setShowFinishWarning] = useState(false)
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true)
@@ -334,10 +334,9 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
               <h3 className="text-2xl font-semibold text-red-800 mb-6">Final Test</h3>
 
               <div className="space-y-6 text-red-700">
-                <p className="text-lg">
-                  Welcome to the final test! You will see <strong>{questions.length} dynamically generated knapsack questions</strong> with
-                  descending difficulty order. As usual, we do NOT expect you
-                  to finish every question in the time given, so plan your time accordingly.
+                <p className="text-xl">
+                  You will complete a final test with <strong>{questions.length} dynamically generated knapsack questions</strong>. You
+                  have exactly <strong>15 minutes</strong> to complete the test.
                 </p>
 
                 {questionLoadError && (
@@ -348,22 +347,36 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
                   </div>
                 )}
 
-                <div className="bg-white p-6 rounded-lg border-2 border-red-200">
-                  <h4 className="text-lg font-semibold mb-4 flex items-center">
-                    <Clock className="h-5 w-5 mr-2" />
-                    Assessment
-                  </h4>
-                  <ul className="text-base space-y-2">
-                    <li>• <strong>Correct answers</strong>: Contribute to your performance assessment</li>
-                    <li>• <strong>Incorrect answers</strong>: Do not contribute to your assessment</li>
-                    <li>• <strong>Unanswered questions</strong>: Considered neutral</li>
-                    <li>• Must confirm answers to count</li>
-                  </ul>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-white p-6 rounded-lg text-gray-800">
+                    <h4 className="text-xl font-semibold mb-4">🧭 Navigation</h4>
+                    <ul className="text-lg space-y-3">
+                      <li>• <strong>You can navigate to any question in the test at any point</strong> by clicking the question menu on the left, or by clicking the arrow buttons on every question.</li>
+                      <li>• You can "highlight" questions by clicking the star icon on the menu.</li>
+                      <li>• As before, <strong>please remember to confirm questions you wish to answer</strong>. You cannot change your answer after confirming, but you can still view them by moving to the question.</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-lg text-gray-800">
+                    <h4 className="text-xl font-semibold mb-4">🎯 Assessment</h4>
+                    <ul className="text-lg space-y-3">
+                      <li>
+                        • <strong>Correct answers</strong>: You are rewarded 2 <strong>probability points</strong>
+                      </li>
+                      <li>
+                        • <strong>Incorrect answers</strong>: You are NOT rewarded <strong>probability points</strong>
+                      </li>
+                      <li>
+                        • <strong>Unanswered questions</strong>: You are rewarded 1 <strong>probability point</strong>
+                      </li>
+                      <li>• <strong>Must confirm answers to count</strong></li>
+                    </ul>
+                  </div>
                 </div>
 
                 <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-6">
-                  <p className="text-lg text-yellow-800 font-medium">
-                    💡 <strong>Strategy Note:</strong> The test is long, and you are NOT expected to finish every question. Plan your time
+                  <p className="text-xl text-yellow-800 font-medium">
+                    💡 <strong>Strategy Tip:</strong> The test is long, and you are NOT expected to finish every question. Plan your time
                     accordingly and focus on questions you can solve accurately.
                   </p>
                 </div>
@@ -513,16 +526,16 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
         </CardHeader>
 
         <CardContent className="p-4">
-          {/* Horizontal Scrollable Question Numbers */}
+          {/* Question Numbers in 2 rows (15 questions each) */}
           <div className="relative">
-            <div className="flex space-x-3 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' }}>
               {questions.map((q, index) => {
                 const isActive = index === currentQuestion
                 const isAnswered = answers[q.id]?.confirmed
                 const isStarred = starredQuestions.has(index)
 
                 return (
-                  <div key={q.id} className="relative flex-shrink-0">
+                  <div key={q.id} className="relative">
                     <button
                       onClick={() => navigateToQuestion(index)}
                       className={`
