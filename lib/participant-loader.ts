@@ -77,7 +77,7 @@ function randomizeQuestionOrder(
   const shuffledEasy = shuffle(easyQuestions);
   const shuffledMedium = shuffle(mediumQuestions);
   const shuffledHard = shuffle(hardQuestions);
-  
+
   const result: Question[] = [];
   let easyIndex = 0;
   let mediumIndex = 0;
@@ -85,13 +85,13 @@ function randomizeQuestionOrder(
   let eRemaining = easyCount;
   let mRemaining = mediumCount;
   let hRemaining = hardCount;
-  
+
   const total = easyCount + mediumCount + hardCount;
-  
+
   for (let i = 0; i < total; i++) {
     const totalRemaining = eRemaining + mRemaining + hRemaining;
     const rand = Math.random() * totalRemaining;
-    
+
     if (rand < eRemaining && easyIndex < shuffledEasy.length) {
       result.push(shuffledEasy[easyIndex++]);
       eRemaining--;
@@ -109,7 +109,7 @@ function randomizeQuestionOrder(
       mRemaining--;
     }
   }
-  
+
   return result;
 }
 
@@ -197,7 +197,7 @@ export function getPracticeQuestions(): Question[] {
       difficulty: "hard"
     }
   ];
-  
+
   return practiceQuestions.filter(q => q.balls.length === NUM_BALLS);
 }
 
@@ -207,12 +207,12 @@ export function getPracticeQuestions(): Question[] {
  */
 export function getSkillTestQuestions(): Question[] {
   const questions = loadQuestionsForPhase('training');
-  
+
   // Shuffle within each difficulty group, but keep groups separate
   const shuffledEasy = shuffle(questions.easy);
   const shuffledMedium = shuffle(questions.medium);
   const shuffledHard = shuffle(questions.hard);
-  
+
   // Return in order: all easy, then all medium, then all hard
   return [
     ...shuffledEasy.slice(0, 3),
@@ -225,42 +225,38 @@ export function getSkillTestQuestions(): Question[] {
  * Get questions for Benchmark Test (Test 2): 10 easy + 10 medium + 10 hard = 30 total
  * Questions are RANDOMIZED (not grouped)
  */
+/**
+ * Get questions for Benchmark Test (Test 2): 30 random questions
+ * Uniformly sampled from ALL available benchmark questions (approx 300)
+ */
 export function getBenchmarkPhaseQuestions(): Question[] {
-  const questions = loadQuestionsForPhase('benchmark');
-  
-  const shuffledEasy = shuffle(questions.easy);
-  const shuffledMedium = shuffle(questions.medium);
-  const shuffledHard = shuffle(questions.hard);
-  
-  return randomizeQuestionOrder(
-    shuffledEasy,
-    shuffledMedium,
-    shuffledHard,
-    10,
-    10,
-    10
+  // Get ALL benchmark questions
+  const allQuestions = (staticQuestions.questions as Question[]).filter(
+    (q) => q.phase === 'benchmark' && q.balls.length === NUM_BALLS
   );
+
+  // Shuffle the entire pool
+  const shuffled = shuffle(allQuestions);
+
+  // Return the first 30
+  return shuffled.slice(0, 30);
 }
 
 /**
- * Get questions for Final Test (Test 3): 10 easy + 10 medium + 10 hard = 30 total
- * Questions are RANDOMIZED (not grouped)
+ * Get questions for Final Test (Test 3): 30 random questions
+ * Uniformly sampled from ALL available prediction questions (approx 300)
  */
 export function getPredictionPhaseQuestions(): Question[] {
-  const questions = loadQuestionsForPhase('prediction');
-  
-  const shuffledEasy = shuffle(questions.easy);
-  const shuffledMedium = shuffle(questions.medium);
-  const shuffledHard = shuffle(questions.hard);
-  
-  return randomizeQuestionOrder(
-    shuffledEasy,
-    shuffledMedium,
-    shuffledHard,
-    10,
-    10,
-    10
+  // Get ALL prediction questions
+  const allQuestions = (staticQuestions.questions as Question[]).filter(
+    (q) => q.phase === 'prediction' && q.balls.length === NUM_BALLS
   );
+
+  // Shuffle the entire pool
+  const shuffled = shuffle(allQuestions);
+
+  // Return the first 30
+  return shuffled.slice(0, 30);
 }
 
 /**
