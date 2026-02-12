@@ -28,15 +28,8 @@ export const sendVerificationEmail = async (email: string, code: string) => {
     try {
         console.log(`[EMAIL] Attempting to send to ${email}...`);
 
-        // Add 20s timeout
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('SendGrid request timed out after 20s')), 20000)
-        );
-
-        await Promise.race([
-            sgMail.send(msg),
-            timeoutPromise
-        ]);
+        // No timeout - allow cold starts
+        await sgMail.send(msg);
 
         console.log(`[EMAIL SENT] 📨 To: ${email} via SendGrid`);
         return true;
