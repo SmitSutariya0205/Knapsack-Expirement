@@ -17,27 +17,31 @@ interface TutorialPhaseProps {
 const sampleQuestions = [
   {
     id: 1,
-    capacity: 10,
+    capacity: 29,
     balls: [
-      { id: 1, weight: 6, reward: 30, color: "bg-red-500" },
-      { id: 2, weight: 3, reward: 14, color: "bg-blue-500" },
-      { id: 3, weight: 4, reward: 16, color: "bg-green-500" },
-      { id: 4, weight: 2, reward: 9, color: "bg-yellow-500" },
+      { id: 1, weight: 2, reward: 21, color: "bg-red-500" },
+      { id: 2, weight: 4, reward: 21, color: "bg-blue-500" },
+      { id: 3, weight: 6, reward: 18, color: "bg-green-500" },
+      { id: 4, weight: 9, reward: 14, color: "bg-yellow-500" },
+      { id: 5, weight: 12, reward: 12, color: "bg-purple-500" },
+      { id: 6, weight: 12, reward: 6, color: "bg-pink-500" }
     ],
-    solution: [1, 3],
-    explanation: "Select balls 1 and 3 for a total weight of 10 (≤10) and reward of 46 points, using the full capacity.",
+    solution: [1, 2, 3, 4],
+    explanation: "Select balls 1, 2, 3 and 4 for a total weight of 21 (≤29) and reward of 74 points.",
   },
   {
     id: 2,
-    capacity: 15,
+    capacity: 32,
     balls: [
-      { id: 1, weight: 10, reward: 60, color: "bg-purple-500" },
-      { id: 2, weight: 5, reward: 40, color: "bg-pink-500" },
-      { id: 3, weight: 15, reward: 120, color: "bg-indigo-500" },
-      { id: 4, weight: 4, reward: 30, color: "bg-orange-500" },
+      { id: 1, weight: 2, reward: 23, color: "bg-red-500" },
+      { id: 2, weight: 6, reward: 19, color: "bg-blue-500" },
+      { id: 3, weight: 7, reward: 15, color: "bg-green-500" },
+      { id: 4, weight: 10, reward: 15, color: "bg-yellow-500" },
+      { id: 5, weight: 12, reward: 10, color: "bg-purple-500" },
+      { id: 6, weight: 12, reward: 9, color: "bg-pink-500" }
     ],
-    solution: [3],
-    explanation: "Select ball 3 for maximum reward of 120 points with weight exactly 15.",
+    solution: [1, 2, 3, 4],
+    explanation: "Select balls 1, 2, 3 and 4 for maximum reward of 72 points with weight 25.",
   },
 ]
 
@@ -45,26 +49,30 @@ const sampleQuestions = [
 const exampleQuestions = [
   {
     id: "tutorial1",
-    capacity: 8,
+    capacity: 31,
     balls: [
-      { id: 1, weight: 5, reward: 20, color: "bg-red-500" },
-      { id: 2, weight: 3, reward: 18, color: "bg-blue-500" },
-      { id: 3, weight: 4, reward: 22, color: "bg-green-500" },
-      { id: 4, weight: 2, reward: 8, color: "bg-yellow-500" },
+      { id: 1, weight: 3, reward: 21, color: "bg-red-500" },
+      { id: 2, weight: 4, reward: 20, color: "bg-blue-500" },
+      { id: 3, weight: 7, reward: 15, color: "bg-green-500" },
+      { id: 4, weight: 10, reward: 15, color: "bg-yellow-500" },
+      { id: 5, weight: 11, reward: 10, color: "bg-purple-500" },
+      { id: 6, weight: 13, reward: 6, color: "bg-pink-500" }
     ],
-    solution: [2, 3], // Optimal solution: balls 2 and 3 for weight=7, reward=40
+    solution: [1, 2, 3, 4], // Optimal
     title: "Example 1"
   },
   {
     id: "tutorial2",
-    capacity: 12,
+    capacity: 31,
     balls: [
-      { id: 1, weight: 6, reward: 25, color: "bg-purple-500" },
-      { id: 2, weight: 4, reward: 20, color: "bg-pink-500" },
-      { id: 3, weight: 8, reward: 35, color: "bg-indigo-500" },
-      { id: 4, weight: 3, reward: 12, color: "bg-cyan-500" },
+      { id: 1, weight: 4, reward: 22, color: "bg-red-500" },
+      { id: 2, weight: 4, reward: 18, color: "bg-blue-500" },
+      { id: 3, weight: 7, reward: 17, color: "bg-green-500" },
+      { id: 4, weight: 10, reward: 15, color: "bg-yellow-500" },
+      { id: 5, weight: 11, reward: 11, color: "bg-purple-500" },
+      { id: 6, weight: 12, reward: 6, color: "bg-pink-500" }
     ],
-    solution: [2, 3], // Optimal solution: balls 2 and 3 for weight=12, reward=55
+    solution: [1, 2, 3, 4], // Optimal
     title: "Example 2"
   }
 ]
@@ -111,9 +119,9 @@ function DynamicExample() {
     const newSelection = selectedBalls.includes(ballId)
       ? selectedBalls.filter(id => id !== ballId)
       : [...selectedBalls, ballId]
-    
+
     setSelectedBalls(newSelection)
-    
+
     // Calculate feedback
     const newWeight = newSelection.reduce(
       (sum, id) => sum + currentExample.balls.find(b => b.id === id)!.weight,
@@ -136,7 +144,7 @@ function DynamicExample() {
     // Check if this is the optimal solution
     const isOptimal = newSelection.length === currentExample.solution.length &&
       currentExample.solution.every(id => newSelection.includes(id))
-    
+
     if (isOptimal) {
       setFeedback({
         type: "success",
@@ -269,13 +277,12 @@ function DynamicExample() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className={`p-3 rounded-lg border-2 text-sm ${
-                  feedback.type === "success"
+                className={`p-3 rounded-lg border-2 text-sm ${feedback.type === "success"
                     ? "bg-green-50 border-green-200 text-green-800"
                     : feedback.type === "too_heavy"
-                    ? "bg-red-50 border-red-200 text-red-800"
-                    : "bg-orange-50 border-orange-200 text-orange-800"
-                }`}
+                      ? "bg-red-50 border-red-200 text-red-800"
+                      : "bg-orange-50 border-orange-200 text-orange-800"
+                  }`}
               >
                 <div className="flex items-center">
                   {feedback.type === "success" && (
@@ -316,9 +323,9 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
                   <Package className="h-8 w-8 text-blue-600" />
                   <h2 className="text-3xl font-bold text-gray-900">The Knapsack Problem</h2>
                 </div>
-                
+
                 <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                  You will be answering a series of questions, each presenting what's called a "knapsack problem." 
+                  You will be answering a series of questions, each presenting what's called a "knapsack problem."
                   These are classic optimization puzzles where you need to make strategic choices to maximize your score.
                 </p>
               </div>
@@ -330,12 +337,12 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
                   <DollarSign className="h-8 w-8 text-green-600" />
                   <h2 className="text-3xl font-bold text-gray-900">Monetary Rewards</h2>
                 </div>
-                
+
                 <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                  <strong>The more questions you answer correctly, the higher monetary reward you will receive.</strong> 
+                  <strong>The more questions you answer correctly, the higher monetary reward you will receive.</strong>
                   Your performance directly impacts your compensation, so it pays to think carefully about each decision!
                 </p>
-                
+
                 <div className="bg-white p-4 rounded-lg shadow-sm max-w-lg mx-auto">
                   <p className="text-lg text-gray-600">
                     📚 <strong>Don't worry!</strong> We will have opportunities to practice before results count.
@@ -399,7 +406,7 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 {/* Goal explanation */}
                 <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mt-4">
                   <p className="text-sm font-semibold text-yellow-900">
