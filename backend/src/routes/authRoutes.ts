@@ -24,14 +24,18 @@ router.post('/auth/send-code', async (req, res) => {
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
         // Upsert verification record
+        console.time('[PERF] DB Upsert');
         await prisma.emailVerification.upsert({
             where: { email },
             update: { code, expiresAt },
             create: { email, code, expiresAt },
         });
+        console.timeEnd('[PERF] DB Upsert');
 
         // Send email
+        console.time('[PERF] Email Send');
         await sendVerificationEmail(email, code);
+        console.timeEnd('[PERF] Email Send');
 
         return res.status(200).json({ success: true, message: 'Verification code sent' });
     } catch (error) {

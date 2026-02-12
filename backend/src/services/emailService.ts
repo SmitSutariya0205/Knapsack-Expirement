@@ -28,9 +28,9 @@ export const sendVerificationEmail = async (email: string, code: string) => {
     try {
         console.log(`[EMAIL] Attempting to send to ${email}...`);
 
-        // Add 10s timeout
+        // Add 20s timeout
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('SendGrid request timed out after 10s')), 10000)
+            setTimeout(() => reject(new Error('SendGrid request timed out after 20s')), 20000)
         );
 
         await Promise.race([
