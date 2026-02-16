@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { Clock, Zap, Trophy, AlertTriangle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import KnapsackQuestion from "@/components/knapsack-question"
+import { getSkillTestQuestions, type Question } from "@/lib/participant-loader"
 
 interface TrainingPhase2Props {
   onNext: () => void
@@ -17,140 +18,7 @@ interface TrainingPhase2Props {
   participantId: string | null
 }
 
-const skillsQuestions = [
-  // Easy questions (1-3)
-  {
-    id: 1,
-    capacity: 10,
-    balls: [
-      { id: 1, weight: 6, reward: 18, color: "bg-red-500" },
-      { id: 2, weight: 4, reward: 12, color: "bg-blue-500" },
-      { id: 3, weight: 3, reward: 9, color: "bg-green-500" },
-    ],
-    solution: [1, 2],
-    difficulty: "easy",
-  },
-  {
-    id: 2,
-    capacity: 12,
-    balls: [
-      { id: 1, weight: 5, reward: 15, color: "bg-purple-500" },
-      { id: 2, weight: 7, reward: 21, color: "bg-yellow-500" },
-      { id: 3, weight: 4, reward: 12, color: "bg-pink-500" },
-      { id: 4, weight: 3, reward: 9, color: "bg-indigo-500" },
-    ],
-    solution: [2, 3],
-    difficulty: "easy",
-  },
-  {
-    id: 3,
-    capacity: 15,
-    balls: [
-      { id: 1, weight: 8, reward: 24, color: "bg-red-500" },
-      { id: 2, weight: 6, reward: 18, color: "bg-blue-500" },
-      { id: 3, weight: 5, reward: 15, color: "bg-green-500" },
-      { id: 4, weight: 4, reward: 12, color: "bg-yellow-500" },
-    ],
-    solution: [1, 2],
-    difficulty: "easy",
-  },
-  // Medium questions (4-7)
-  {
-    id: 4,
-    capacity: 18,
-    balls: [
-      { id: 1, weight: 9, reward: 27, color: "bg-orange-500" },
-      { id: 2, weight: 7, reward: 21, color: "bg-teal-500" },
-      { id: 3, weight: 6, reward: 18, color: "bg-rose-500" },
-      { id: 4, weight: 5, reward: 15, color: "bg-cyan-500" },
-      { id: 5, weight: 4, reward: 12, color: "bg-lime-500" },
-    ],
-    solution: [1, 2],
-    difficulty: "medium",
-  },
-  {
-    id: 5,
-    capacity: 20,
-    balls: [
-      { id: 1, weight: 10, reward: 30, color: "bg-red-500" },
-      { id: 2, weight: 8, reward: 24, color: "bg-blue-500" },
-      { id: 3, weight: 6, reward: 18, color: "bg-green-500" },
-      { id: 4, weight: 5, reward: 15, color: "bg-yellow-500" },
-      { id: 5, weight: 4, reward: 12, color: "bg-purple-500" },
-    ],
-    solution: [1, 2],
-    difficulty: "medium",
-  },
-  {
-    id: 6,
-    capacity: 22,
-    balls: [
-      { id: 1, weight: 12, reward: 36, color: "bg-indigo-500" },
-      { id: 2, weight: 10, reward: 30, color: "bg-pink-500" },
-      { id: 3, weight: 8, reward: 24, color: "bg-orange-500" },
-      { id: 4, weight: 6, reward: 18, color: "bg-teal-500" },
-      { id: 5, weight: 5, reward: 15, color: "bg-rose-500" },
-    ],
-    solution: [1, 2],
-    difficulty: "medium",
-  },
-  {
-    id: 7,
-    capacity: 25,
-    balls: [
-      { id: 1, weight: 15, reward: 45, color: "bg-cyan-500" },
-      { id: 2, weight: 12, reward: 36, color: "bg-lime-500" },
-      { id: 3, weight: 10, reward: 30, color: "bg-amber-500" },
-      { id: 4, weight: 8, reward: 24, color: "bg-emerald-500" },
-      { id: 5, weight: 6, reward: 18, color: "bg-violet-500" },
-    ],
-    solution: [1, 4],
-    difficulty: "medium",
-  },
-  // Hard questions (8-10)
-  {
-    id: 8,
-    capacity: 30,
-    balls: [
-      { id: 1, weight: 18, reward: 54, color: "bg-red-500" },
-      { id: 2, weight: 15, reward: 45, color: "bg-blue-500" },
-      { id: 3, weight: 12, reward: 36, color: "bg-green-500" },
-      { id: 4, weight: 10, reward: 30, color: "bg-yellow-500" },
-      { id: 5, weight: 8, reward: 24, color: "bg-purple-500" },
-      { id: 6, weight: 6, reward: 18, color: "bg-pink-500" },
-    ],
-    solution: [1, 3],
-    difficulty: "hard",
-  },
-  {
-    id: 9,
-    capacity: 35,
-    balls: [
-      { id: 1, weight: 20, reward: 60, color: "bg-indigo-500" },
-      { id: 2, weight: 18, reward: 54, color: "bg-orange-500" },
-      { id: 3, weight: 15, reward: 45, color: "bg-teal-500" },
-      { id: 4, weight: 12, reward: 36, color: "bg-rose-500" },
-      { id: 5, weight: 10, reward: 30, color: "bg-cyan-500" },
-      { id: 6, weight: 8, reward: 24, color: "bg-lime-500" },
-    ],
-    solution: [1, 3],
-    difficulty: "hard",
-  },
-  {
-    id: 10,
-    capacity: 40,
-    balls: [
-      { id: 1, weight: 25, reward: 75, color: "bg-amber-500" },
-      { id: 2, weight: 20, reward: 60, color: "bg-emerald-500" },
-      { id: 3, weight: 18, reward: 54, color: "bg-violet-500" },
-      { id: 4, weight: 15, reward: 45, color: "bg-sky-500" },
-      { id: 5, weight: 12, reward: 36, color: "bg-stone-500" },
-      { id: 6, weight: 10, reward: 30, color: "bg-red-500" },
-    ],
-    solution: [1, 4],
-    difficulty: "hard",
-  },
-]
+// Questions loaded dynamically from static-questions.json via participant-loader
 
 export default function TrainingPhase2({ onNext, updateParticipantData, participantId }: TrainingPhase2Props) {
   const [currentQuestion, setCurrentQuestion] = useState(0)
@@ -165,6 +33,13 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
   const [isComplete, setIsComplete] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const hasCompleted = useRef(false)
+
+  // Load questions dynamically from the question bank (all 6-ball)
+  const [skillsQuestions, setSkillsQuestions] = useState<Question[]>([])
+  useEffect(() => {
+    const questions = getSkillTestQuestions()
+    setSkillsQuestions(questions)
+  }, [])
 
   // Total timer
   useEffect(() => {
@@ -334,13 +209,32 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
     return `${mins}:${secs.toString().padStart(2, "0")}`
   }
 
+  // Guard: Don't render question UI if questions haven't loaded yet
+  if (skillsQuestions.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto p-6">
+        <Card className="shadow-lg">
+          <CardContent className="p-8 text-center">
+            <div className="space-y-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl mb-4">
+                <Zap className="h-8 w-8 text-white animate-pulse" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Loading Test 1 Questions</h2>
+              <p className="text-gray-600">Preparing your questions...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   const question = skillsQuestions[currentQuestion]
   const progress = ((currentQuestion + 1) / skillsQuestions.length) * 100
   const difficultyColor = {
     easy: "bg-green-500",
     medium: "bg-yellow-500",
     hard: "bg-red-500",
-  }[question.difficulty]
+  }[question?.difficulty ?? "easy"]
   if (showInstructions) {
     return (
       <div className="max-w-7xl mx-auto">
