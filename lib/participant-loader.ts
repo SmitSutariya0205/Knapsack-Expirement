@@ -118,349 +118,107 @@ function randomizeQuestionOrder(
  */
 export function getPracticeQuestions(): Question[] {
   const practiceQuestions: Question[] = [
+    // Easy 1: capacity=14, optimal=[1,2,3,4], weight=14, reward=47
     {
       "id": 1,
-      "capacity": 34,
+      "capacity": 14,
       "balls": [
-        {
-          "id": 1,
-          "weight": 2,
-          "reward": 22,
-          "color": "bg-red-500"
-        },
-        {
-          "id": 2,
-          "weight": 4,
-          "reward": 19,
-          "color": "bg-blue-500"
-        },
-        {
-          "id": 3,
-          "weight": 7,
-          "reward": 18,
-          "color": "bg-green-500"
-        },
-        {
-          "id": 4,
-          "weight": 8,
-          "reward": 14,
-          "color": "bg-yellow-500"
-        },
-        {
-          "id": 5,
-          "weight": 12,
-          "reward": 9,
-          "color": "bg-purple-500"
-        },
-        {
-          "id": 6,
-          "weight": 12,
-          "reward": 7,
-          "color": "bg-pink-500"
-        }
+        { "id": 1, "weight": 2, "reward": 10, "color": "bg-red-500" },
+        { "id": 2, "weight": 3, "reward": 12, "color": "bg-blue-500" },
+        { "id": 3, "weight": 4, "reward": 11, "color": "bg-green-500" },
+        { "id": 4, "weight": 5, "reward": 14, "color": "bg-yellow-500" },
+        { "id": 5, "weight": 7, "reward": 6, "color": "bg-purple-500" },
+        { "id": 6, "weight": 9, "reward": 4, "color": "bg-pink-500" }
       ],
-      "solution": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ],
-      "explanation": "The optimal selection maximizes reward (82) while staying within capacity (33/34).",
+      "solution": [1, 2, 3, 4],
+      "explanation": "Select balls 1, 2, 3 and 4 for weight 14 (= capacity) and maximum reward of 47.",
       "difficulty": "easy",
-      "phase": "training",
-      "metadata": {
-        "dominanceCount": 5,
-        "slackRatio": 0.7555555555555555,
-        "optimalityGap": 2,
-        "densityVariance": 12.963230662635423
-      }
+      "phase": "training"
     },
+    // Easy 2: capacity=15, optimal=[1,2,3,4], weight=15, reward=51
     {
       "id": 2,
-      "capacity": 34,
+      "capacity": 15,
       "balls": [
-        {
-          "id": 1,
-          "weight": 3,
-          "reward": 22,
-          "color": "bg-red-500"
-        },
-        {
-          "id": 2,
-          "weight": 4,
-          "reward": 21,
-          "color": "bg-blue-500"
-        },
-        {
-          "id": 3,
-          "weight": 6,
-          "reward": 17,
-          "color": "bg-green-500"
-        },
-        {
-          "id": 4,
-          "weight": 8,
-          "reward": 14,
-          "color": "bg-yellow-500"
-        },
-        {
-          "id": 5,
-          "weight": 11,
-          "reward": 10,
-          "color": "bg-purple-500"
-        },
-        {
-          "id": 6,
-          "weight": 14,
-          "reward": 7,
-          "color": "bg-pink-500"
-        }
+        { "id": 1, "weight": 2, "reward": 11, "color": "bg-red-500" },
+        { "id": 2, "weight": 3, "reward": 13, "color": "bg-blue-500" },
+        { "id": 3, "weight": 4, "reward": 12, "color": "bg-green-500" },
+        { "id": 4, "weight": 6, "reward": 15, "color": "bg-yellow-500" },
+        { "id": 5, "weight": 8, "reward": 7, "color": "bg-purple-500" },
+        { "id": 6, "weight": 10, "reward": 5, "color": "bg-pink-500" }
       ],
-      "solution": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ],
-      "explanation": "The optimal selection maximizes reward (84) while staying within capacity (32/34).",
+      "solution": [1, 2, 3, 4],
+      "explanation": "Select balls 1, 2, 3 and 4 for weight 15 (= capacity) and maximum reward of 51.",
       "difficulty": "easy",
-      "phase": "training",
-      "metadata": {
-        "dominanceCount": 5,
-        "slackRatio": 0.7391304347826086,
-        "optimalityGap": 10,
-        "densityVariance": 5.99953448627691
-      }
+      "phase": "training"
     },
+    // Medium 1: capacity=21, optimal=[1,2,3,4], weight=21, reward=63
     {
       "id": 3,
       "capacity": 21,
       "balls": [
-        {
-          "id": 1,
-          "weight": 3,
-          "reward": 30,
-          "color": "bg-red-500"
-        },
-        {
-          "id": 2,
-          "weight": 5,
-          "reward": 28,
-          "color": "bg-blue-500"
-        },
-        {
-          "id": 3,
-          "weight": 7,
-          "reward": 26,
-          "color": "bg-green-500"
-        },
-        {
-          "id": 4,
-          "weight": 8,
-          "reward": 13,
-          "color": "bg-yellow-500"
-        },
-        {
-          "id": 5,
-          "weight": 4,
-          "reward": 30,
-          "color": "bg-purple-500"
-        },
-        {
-          "id": 6,
-          "weight": 5,
-          "reward": 20,
-          "color": "bg-pink-500"
-        }
+        { "id": 1, "weight": 3, "reward": 15, "color": "bg-red-500" },
+        { "id": 2, "weight": 5, "reward": 18, "color": "bg-blue-500" },
+        { "id": 3, "weight": 6, "reward": 16, "color": "bg-green-500" },
+        { "id": 4, "weight": 7, "reward": 14, "color": "bg-yellow-500" },
+        { "id": 5, "weight": 8, "reward": 5, "color": "bg-purple-500" },
+        { "id": 6, "weight": 4, "reward": 13, "color": "bg-pink-500" }
       ],
-      "solution": [
-        1,
-        2,
-        3,
-        5
-      ],
-      "explanation": "The optimal selection maximizes reward (114) while staying within capacity (19/21).",
+      "solution": [1, 2, 3, 4],
+      "explanation": "Select balls 1, 2, 3 and 4 for weight 21 (= capacity) and maximum reward of 63.",
       "difficulty": "medium",
-      "phase": "training",
-      "metadata": {
-        "dominanceCount": 5,
-        "slackRatio": 0.65625,
-        "optimalityGap": 6,
-        "densityVariance": 7.443666737528345
-      }
+      "phase": "training"
     },
+    // Medium 2: capacity=20, optimal=[1,2,3,4], weight=20, reward=60
     {
       "id": 4,
-      "capacity": 23,
+      "capacity": 20,
       "balls": [
-        {
-          "id": 1,
-          "weight": 3,
-          "reward": 30,
-          "color": "bg-red-500"
-        },
-        {
-          "id": 2,
-          "weight": 5,
-          "reward": 28,
-          "color": "bg-blue-500"
-        },
-        {
-          "id": 3,
-          "weight": 7,
-          "reward": 26,
-          "color": "bg-green-500"
-        },
-        {
-          "id": 4,
-          "weight": 10,
-          "reward": 14,
-          "color": "bg-yellow-500"
-        },
-        {
-          "id": 5,
-          "weight": 4,
-          "reward": 19,
-          "color": "bg-purple-500"
-        },
-        {
-          "id": 6,
-          "weight": 8,
-          "reward": 16,
-          "color": "bg-pink-500"
-        }
+        { "id": 1, "weight": 3, "reward": 14, "color": "bg-red-500" },
+        { "id": 2, "weight": 4, "reward": 16, "color": "bg-blue-500" },
+        { "id": 3, "weight": 5, "reward": 13, "color": "bg-green-500" },
+        { "id": 4, "weight": 8, "reward": 17, "color": "bg-yellow-500" },
+        { "id": 5, "weight": 9, "reward": 6, "color": "bg-purple-500" },
+        { "id": 6, "weight": 11, "reward": 4, "color": "bg-pink-500" }
       ],
-      "solution": [
-        1,
-        2,
-        3,
-        5
-      ],
-      "explanation": "The optimal selection maximizes reward (103) while staying within capacity (19/23).",
+      "solution": [1, 2, 3, 4],
+      "explanation": "Select balls 1, 2, 3 and 4 for weight 20 (= capacity) and maximum reward of 60.",
       "difficulty": "medium",
-      "phase": "training",
-      "metadata": {
-        "dominanceCount": 5,
-        "slackRatio": 0.6216216216216216,
-        "optimalityGap": 3,
-        "densityVariance": 7.993986678004535
-      }
+      "phase": "training"
     },
+    // Hard 1: capacity=24, optimal=[1,2,3,4], weight=24, reward=66
     {
       "id": 5,
-      "capacity": 28,
+      "capacity": 24,
       "balls": [
-        {
-          "id": 1,
-          "weight": 4,
-          "reward": 36,
-          "color": "bg-red-500"
-        },
-        {
-          "id": 2,
-          "weight": 6,
-          "reward": 34,
-          "color": "bg-blue-500"
-        },
-        {
-          "id": 3,
-          "weight": 8,
-          "reward": 32,
-          "color": "bg-green-500"
-        },
-        {
-          "id": 4,
-          "weight": 5,
-          "reward": 19,
-          "color": "bg-yellow-500"
-        },
-        {
-          "id": 5,
-          "weight": 6,
-          "reward": 36,
-          "color": "bg-purple-500"
-        },
-        {
-          "id": 6,
-          "weight": 9,
-          "reward": 31,
-          "color": "bg-pink-500"
-        }
+        { "id": 1, "weight": 4, "reward": 18, "color": "bg-red-500" },
+        { "id": 2, "weight": 5, "reward": 17, "color": "bg-blue-500" },
+        { "id": 3, "weight": 6, "reward": 16, "color": "bg-green-500" },
+        { "id": 4, "weight": 9, "reward": 15, "color": "bg-yellow-500" },
+        { "id": 5, "weight": 7, "reward": 10, "color": "bg-purple-500" },
+        { "id": 6, "weight": 3, "reward": 12, "color": "bg-pink-500" }
       ],
-      "solution": [
-        1,
-        2,
-        3,
-        5
-      ],
-      "explanation": "The optimal selection maximizes reward (138) while staying within capacity (24/28).",
+      "solution": [1, 2, 3, 4],
+      "explanation": "Select balls 1, 2, 3 and 4 for weight 24 (= capacity) and maximum reward of 66.",
       "difficulty": "hard",
-      "phase": "training",
-      "metadata": {
-        "dominanceCount": 5,
-        "slackRatio": 0.7368421052631579,
-        "optimalityGap": 1,
-        "densityVariance": 3.6159122085048003
-      }
+      "phase": "training"
     },
+    // Hard 2: capacity=22, optimal=[1,2,3,4], weight=22, reward=68
     {
       "id": 6,
-      "capacity": 30,
+      "capacity": 22,
       "balls": [
-        {
-          "id": 1,
-          "weight": 8,
-          "reward": 33,
-          "color": "bg-red-500"
-        },
-        {
-          "id": 2,
-          "weight": 12,
-          "reward": 16,
-          "color": "bg-blue-500"
-        },
-        {
-          "id": 3,
-          "weight": 11,
-          "reward": 24,
-          "color": "bg-green-500"
-        },
-        {
-          "id": 4,
-          "weight": 4,
-          "reward": 21,
-          "color": "bg-yellow-500"
-        },
-        {
-          "id": 5,
-          "weight": 4,
-          "reward": 13,
-          "color": "bg-purple-500"
-        },
-        {
-          "id": 6,
-          "weight": 7,
-          "reward": 14,
-          "color": "bg-pink-500"
-        }
+        { "id": 1, "weight": 3, "reward": 16, "color": "bg-red-500" },
+        { "id": 2, "weight": 5, "reward": 19, "color": "bg-blue-500" },
+        { "id": 3, "weight": 6, "reward": 15, "color": "bg-green-500" },
+        { "id": 4, "weight": 8, "reward": 18, "color": "bg-yellow-500" },
+        { "id": 5, "weight": 9, "reward": 7, "color": "bg-purple-500" },
+        { "id": 6, "weight": 11, "reward": 5, "color": "bg-pink-500" }
       ],
-      "solution": [
-        1,
-        3,
-        4,
-        6
-      ],
-      "explanation": "The optimal selection maximizes reward (92) while staying within capacity (30/30).",
+      "solution": [1, 2, 3, 4],
+      "explanation": "Select balls 1, 2, 3 and 4 for weight 22 (= capacity) and maximum reward of 68.",
       "difficulty": "hard",
-      "phase": "training",
-      "metadata": {
-        "dominanceCount": 4,
-        "slackRatio": 0.6521739130434783,
-        "optimalityGap": 1,
-        "densityVariance": 1.8057584206968682
-      }
+      "phase": "training"
     }
   ];
 
