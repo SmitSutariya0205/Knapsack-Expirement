@@ -17,62 +17,63 @@ interface TutorialPhaseProps {
 const sampleQuestions = [
   {
     id: 1,
-    capacity: 29,
+    capacity: 12,
     balls: [
-      { id: 1, weight: 2, reward: 21, color: "bg-red-500" },
-      { id: 2, weight: 4, reward: 21, color: "bg-blue-500" },
-      { id: 3, weight: 6, reward: 18, color: "bg-green-500" },
-      { id: 4, weight: 9, reward: 14, color: "bg-yellow-500" },
-      { id: 5, weight: 12, reward: 12, color: "bg-purple-500" },
-      { id: 6, weight: 12, reward: 6, color: "bg-pink-500" }
+      { id: 1, weight: 2, reward: 10, color: "bg-red-500" },
+      { id: 2, weight: 3, reward: 12, color: "bg-blue-500" },
+      { id: 3, weight: 3, reward: 11, color: "bg-green-500" },
+      { id: 4, weight: 4, reward: 13, color: "bg-yellow-500" },
+      { id: 5, weight: 7, reward: 6, color: "bg-purple-500" },
+      { id: 6, weight: 9, reward: 4, color: "bg-pink-500" }
     ],
     solution: [1, 2, 3, 4],
-    explanation: "Select balls 1, 2, 3 and 4 for a total weight of 21 (≤29) and reward of 74 points.",
+    explanation: "Select balls 1, 2, 3 and 4 for a total weight of 12 (= capacity) and maximum reward of 46 points.",
   },
   {
     id: 2,
-    capacity: 32,
+    capacity: 16,
     balls: [
-      { id: 1, weight: 2, reward: 23, color: "bg-red-500" },
-      { id: 2, weight: 6, reward: 19, color: "bg-blue-500" },
-      { id: 3, weight: 7, reward: 15, color: "bg-green-500" },
-      { id: 4, weight: 10, reward: 15, color: "bg-yellow-500" },
-      { id: 5, weight: 12, reward: 10, color: "bg-purple-500" },
-      { id: 6, weight: 12, reward: 9, color: "bg-pink-500" }
+      { id: 1, weight: 2, reward: 9, color: "bg-red-500" },
+      { id: 2, weight: 3, reward: 11, color: "bg-blue-500" },
+      { id: 3, weight: 4, reward: 13, color: "bg-green-500" },
+      { id: 4, weight: 7, reward: 15, color: "bg-yellow-500" },
+      { id: 5, weight: 8, reward: 5, color: "bg-purple-500" },
+      { id: 6, weight: 11, reward: 3, color: "bg-pink-500" }
     ],
     solution: [1, 2, 3, 4],
-    explanation: "Select balls 1, 2, 3 and 4 for maximum reward of 72 points with weight 25.",
+    explanation: "Select balls 1, 2, 3 and 4 for a total weight of 16 (= capacity) and maximum reward of 48 points.",
   },
 ]
 
 // Interactive example questions for tutorial
+// Optimal solutions fill the capacity exactly to reinforce the concept
 const exampleQuestions = [
   {
     id: "tutorial1",
-    capacity: 31,
+    capacity: 14,
     balls: [
-      { id: 1, weight: 3, reward: 21, color: "bg-red-500" },
-      { id: 2, weight: 4, reward: 20, color: "bg-blue-500" },
-      { id: 3, weight: 7, reward: 15, color: "bg-green-500" },
-      { id: 4, weight: 10, reward: 15, color: "bg-yellow-500" },
-      { id: 5, weight: 11, reward: 10, color: "bg-purple-500" },
-      { id: 6, weight: 13, reward: 6, color: "bg-pink-500" }
+      { id: 1, weight: 2, reward: 8, color: "bg-red-500" },
+      { id: 2, weight: 3, reward: 10, color: "bg-blue-500" },
+      { id: 3, weight: 4, reward: 12, color: "bg-green-500" },
+      { id: 4, weight: 5, reward: 14, color: "bg-yellow-500" },
+      { id: 5, weight: 7, reward: 6, color: "bg-purple-500" },
+      { id: 6, weight: 9, reward: 4, color: "bg-pink-500" }
     ],
-    solution: [1, 2, 3, 4], // Optimal
+    solution: [1, 2, 3, 4], // weight=14 (=capacity), reward=44
     title: "Example 1"
   },
   {
     id: "tutorial2",
-    capacity: 31,
+    capacity: 18,
     balls: [
-      { id: 1, weight: 4, reward: 22, color: "bg-red-500" },
-      { id: 2, weight: 4, reward: 18, color: "bg-blue-500" },
-      { id: 3, weight: 7, reward: 17, color: "bg-green-500" },
-      { id: 4, weight: 10, reward: 15, color: "bg-yellow-500" },
-      { id: 5, weight: 11, reward: 11, color: "bg-purple-500" },
-      { id: 6, weight: 12, reward: 6, color: "bg-pink-500" }
+      { id: 1, weight: 3, reward: 12, color: "bg-red-500" },
+      { id: 2, weight: 4, reward: 14, color: "bg-blue-500" },
+      { id: 3, weight: 5, reward: 16, color: "bg-green-500" },
+      { id: 4, weight: 6, reward: 18, color: "bg-yellow-500" },
+      { id: 5, weight: 8, reward: 7, color: "bg-purple-500" },
+      { id: 6, weight: 10, reward: 5, color: "bg-pink-500" }
     ],
-    solution: [1, 2, 3, 4], // Optimal
+    solution: [1, 2, 3, 4], // weight=18 (=capacity), reward=60
     title: "Example 2"
   }
 ]
@@ -141,29 +142,24 @@ function DynamicExample() {
       return
     }
 
-    // Check if this is the optimal solution
-    const isOptimal = newSelection.length === currentExample.solution.length &&
-      currentExample.solution.every(id => newSelection.includes(id))
+    // Calculate optimal reward from known solution
+    const optimalReward = currentExample.solution.reduce(
+      (sum, id) => sum + currentExample.balls.find(b => b.id === id)!.reward,
+      0
+    )
 
-    if (isOptimal) {
+    // Check optimality by comparing REWARD values (not exact IDs)
+    // This correctly handles alternative optimal combinations
+    if (newReward >= optimalReward) {
       setFeedback({
         type: "success",
         message: "Nice! This is just right! You found the optimal solution."
       })
     } else if (newSelection.length > 0) {
-      // Check if there's a better combination possible
-      const optimalReward = currentExample.solution.reduce(
-        (sum, id) => sum + currentExample.balls.find(b => b.id === id)!.reward,
-        0
-      )
-      if (newReward < optimalReward) {
-        setFeedback({
-          type: "suboptimal",
-          message: "Oops, some other combination will give you more reward!"
-        })
-      } else {
-        setFeedback({ type: "none", message: "" })
-      }
+      setFeedback({
+        type: "suboptimal",
+        message: "Oops, some other combination will give you more reward!"
+      })
     } else {
       setFeedback({ type: "none", message: "" })
     }
@@ -211,7 +207,7 @@ function DynamicExample() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Balls display */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {currentExample.balls.map((ball) => (
               <motion.div
                 key={ball.id}
@@ -278,10 +274,10 @@ function DynamicExample() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 className={`p-3 rounded-lg border-2 text-sm ${feedback.type === "success"
-                    ? "bg-green-50 border-green-200 text-green-800"
-                    : feedback.type === "too_heavy"
-                      ? "bg-red-50 border-red-200 text-red-800"
-                      : "bg-orange-50 border-orange-200 text-orange-800"
+                  ? "bg-green-50 border-green-200 text-green-800"
+                  : feedback.type === "too_heavy"
+                    ? "bg-red-50 border-red-200 text-red-800"
+                    : "bg-orange-50 border-orange-200 text-orange-800"
                   }`}
               >
                 <div className="flex items-center">
