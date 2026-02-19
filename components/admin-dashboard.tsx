@@ -410,6 +410,36 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
                       <h3 className="text-lg font-semibold mb-3">Results Summary - All Sections</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
+                        {/* Practice */}
+                        {participantDetails.testResults?.practice && (
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm font-medium text-gray-600">Practice</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-2 text-sm">
+                                {participantDetails.testResults.practice.completed ? (
+                                  <>
+                                    <div className="flex justify-between">
+                                      <span className="text-gray-600">Correct:</span>
+                                      <span className="font-bold text-blue-600">
+                                        {participantDetails.testResults.practice.correctAnswers}/{participantDetails.testResults.practice.totalQuestions}
+                                      </span>
+                                    </div>
+                                    {participantDetails.testResults.practice.accuracy != null && (
+                                      <div className="flex justify-between text-xs">
+                                        <span className="text-gray-500">Accuracy:</span>
+                                        <span>{(participantDetails.testResults.practice.accuracy * 100).toFixed(1)}%</span>
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="text-gray-400 text-xs">Not completed</span>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
 
                         {/* Skill Test */}
                         {participantDetails.testResults?.skill && (

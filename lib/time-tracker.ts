@@ -8,9 +8,11 @@ export class TimeTracker {
   private interactions: Array<{type: string, timestamp: Date, data?: any}> = []
 
   constructor(participantId?: string) {
-    // Only access localStorage on client side
+    // Prefer sessionStorage (used by Prolific/auth flow), then localStorage
     if (typeof window !== 'undefined') {
-      this.participantId = participantId || localStorage.getItem('participantId')
+      this.participantId = participantId
+        || sessionStorage.getItem('participantId')
+        || localStorage.getItem('participantId')
     } else {
       this.participantId = participantId || null
     }

@@ -655,7 +655,7 @@ router.get('/api/v1/admin/export-csv', adminAuth, async (req, res) => {
         safeNum(skill.accuracy),
         safeNum(skill.totalPoints),
         // Benchmark
-        safeBool(skill.completed),
+        safeBool(benchmark.completed),
         safeNum(benchmark.accuracy),
         safeNum(benchmark.totalPoints),
         // Strategy
