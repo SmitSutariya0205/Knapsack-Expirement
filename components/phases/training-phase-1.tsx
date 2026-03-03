@@ -225,10 +225,16 @@ export default function TrainingPhase1({ onNext, updateParticipantData, particip
               <h3 className="text-2xl font-semibold text-green-800 mb-6">Welcome to the Practice Section!</h3>
 
               <div className="space-y-6 text-green-700">
-                <ul className="text-lg space-y-3 list-disc list-inside ml-4">
-                  <li>Your answers in this section does not count towards your score. Do not worry about mistakes.</li>
-                  <li>Questions are not timed (yet), so take your time to learn.</li>
-                  <li>Solutions will be revealed to you after you complete a question.</li>
+                <ul className="text-lg sm:text-xl leading-relaxed space-y-3 list-disc list-inside ml-4">
+                  <li>
+                    Your answers in this section <strong>does not count</strong> towards your score. Do not worry about mistakes.
+                  </li>
+                  <li>
+                    Questions are <strong>not timed (yet)</strong>, so take your time to learn.
+                  </li>
+                  <li>
+                    <strong>Solutions will be revealed</strong> to you after you complete a question.
+                  </li>
                 </ul>
               </div>
             </div>
