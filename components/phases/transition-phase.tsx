@@ -35,7 +35,6 @@ export default function TransitionPhase({ onNext }: TransitionPhaseProps) {
                                     <h4 className="font-semibold text-blue-900">Navigation Allowed</h4>
                                     <p className="text-sm text-blue-800 mt-1">
                                         You can now jump between any question in the test.
-                                        Feel free to skip hard questions and come back to them later.
                                     </p>
                                 </div>
                             </div>
