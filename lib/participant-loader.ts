@@ -114,6 +114,74 @@ function randomizeQuestionOrder(
 }
 
 /**
+ * Mathematically enforces that NO dominance relationships exist between any balls.
+ * By strictly ordering weights and strictly ordering rewards, we ensure:
+ * If W_A < W_B, then R_A < R_B. 
+ * A does NOT dominate B (since R_A < R_B).
+ * B does NOT dominate A (since W_B > W_A).
+ * This forces ZERO dominance relationships.
+ */
+function enforceHardDominance(q: Question): Question {
+  const newQ: Question = JSON.parse(JSON.stringify(q));
+
+  // Sort balls by weight to assign monotonic relationships
+  newQ.balls.sort((a, b) => a.weight - b.weight);
+
+  // Ensure weights are strictly increasing
+  for (let i = 1; i < newQ.balls.length; i++) {
+    if (newQ.balls[i].weight <= newQ.balls[i - 1].weight) {
+      newQ.balls[i].weight = newQ.balls[i - 1].weight + 1;
+    }
+  }
+
+  // Collect rewards and sort them ascending
+  let rewards = newQ.balls.map(b => b.reward).sort((a, b) => a - b);
+
+  // Ensure rewards are strictly increasing
+  for (let i = 1; i < rewards.length; i++) {
+    if (rewards[i] <= rewards[i - 1]) {
+      rewards[i] = rewards[i - 1] + 1;
+    }
+  }
+
+  // Assign strictly increasing rewards to strictly increasing weights
+  for (let i = 0; i < newQ.balls.length; i++) {
+    newQ.balls[i].reward = rewards[i];
+  }
+
+  // Recalculate optimal solution using brute-force (since 6 balls is very small)
+  let bestReward = -1;
+  let bestSubset: number[] = [];
+  const n = newQ.balls.length;
+
+  for (let i = 0; i < (1 << n); i++) {
+    let currentWeight = 0;
+    let currentReward = 0;
+    let currentSubset: number[] = [];
+
+    for (let j = 0; j < n; j++) {
+      if ((i & (1 << j)) !== 0) {
+        currentWeight += newQ.balls[j].weight;
+        currentReward += newQ.balls[j].reward;
+        currentSubset.push(newQ.balls[j].id);
+      }
+    }
+
+    if (currentWeight <= newQ.capacity && currentReward > bestReward) {
+      bestReward = currentReward;
+      bestSubset = currentSubset;
+    }
+  }
+
+  newQ.solution = bestSubset;
+  if (newQ.explanation) {
+    newQ.explanation = `Select balls ${bestSubset.join(', ')} for a maximum reward of ${bestReward}.`;
+  }
+
+  return newQ;
+}
+
+/**
  * Get practice questions (hardcoded 6 questions: 2 easy + 2 medium + 2 hard)
  */
 export function getPracticeQuestions(): Question[] {
@@ -123,7 +191,10 @@ export function getPracticeQuestions(): Question[] {
   // We'll shuffle each difficulty bucket separately and take 2 from each
   const practiceEasy = shuffle(questions.easy).slice(0, 2);
   const practiceMedium = shuffle(questions.medium).slice(0, 2);
-  const practiceHard = shuffle(questions.hard).slice(0, 2);
+
+  // The static-questions.json lacks natively "strict no-dominance" Hard questions.
+  // We map them through enforceHardDominance to perfectly satisfy the rule just for Practice.
+  const practiceHard = shuffle(questions.hard).slice(0, 2).map(enforceHardDominance);
 
   return [
     ...practiceEasy,
