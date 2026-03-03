@@ -405,9 +405,14 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
 
                 {/* Goal explanation */}
                 <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mt-4">
-                  <p className="text-sm font-semibold text-yellow-900">
-                    <strong>Your goal:</strong> Select balls to be placed in the Knapsack, maximizing the reward combined on the balls while making sure weight stays below knapsack's capacity!
+                  <p className="text-base sm:text-lg font-extrabold text-yellow-900 mb-2">
+                    Your goal
                   </p>
+                  <ul className="list-disc list-inside text-sm sm:text-base text-yellow-900 space-y-1">
+                    <li>Select balls to be placed in the knapsack.</li>
+                    <li>Maximize the combined reward.</li>
+                    <li>Keep the total weight below the knapsack’s capacity.</li>
+                  </ul>
                 </div>
               </div>
             </div>
