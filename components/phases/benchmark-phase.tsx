@@ -148,12 +148,17 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
     }
 
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+
       const res = await fetch(`${API_BASE}/api/v1/ingest-phase`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        signal: controller.signal
       })
 
+      clearTimeout(timeoutId)
       if (!res.ok) throw new Error("Failed to submit benchmark test data")
 
       updateParticipantData({

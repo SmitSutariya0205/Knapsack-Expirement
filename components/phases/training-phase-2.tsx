@@ -168,7 +168,7 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
 
       // Add timeout to prevent hanging
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
 
       const res = await fetch(`${API_BASE}/api/v1/ingest-phase`, {
         method: "POST",

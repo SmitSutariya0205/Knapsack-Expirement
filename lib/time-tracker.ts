@@ -5,7 +5,7 @@ export class TimeTracker {
   private participantId: string | null = null
   private sectionName: string | null = null
   private questionId: number | null = null
-  private interactions: Array<{type: string, timestamp: Date, data?: any}> = []
+  private interactions: Array<{ type: string, timestamp: Date, data?: any }> = []
 
   constructor(participantId?: string) {
     // Prefer sessionStorage (used by Prolific/auth flow), then localStorage
@@ -25,9 +25,9 @@ export class TimeTracker {
     this.startTime = new Date()
     this.endTime = null
     this.interactions = []
-    
+
     console.log(`[TimeTracker] Started section: ${sectionName}`)
-    
+
     // Log section start to backend
     this.logTimeData({
       sectionName,
@@ -44,7 +44,7 @@ export class TimeTracker {
     this.startTime = new Date()
     this.endTime = null
     this.interactions = []
-    
+
     console.log(`[TimeTracker] Started question ${questionId} in section ${this.sectionName}`)
   }
 
@@ -57,9 +57,9 @@ export class TimeTracker {
 
     this.endTime = new Date()
     const timeSpent = this.endTime.getTime() - this.startTime.getTime()
-    
+
     console.log(`[TimeTracker] Question ${this.questionId} completed in ${timeSpent}ms`)
-    
+
     // Log question time to backend
     this.logTimeData({
       sectionName: this.sectionName,
@@ -81,9 +81,9 @@ export class TimeTracker {
 
     this.endTime = new Date()
     const timeSpent = this.endTime.getTime() - this.startTime.getTime()
-    
+
     console.log(`[TimeTracker] Section ${this.sectionName} completed in ${timeSpent}ms`)
-    
+
     // Log section completion to backend
     this.logTimeData({
       sectionName: this.sectionName,
@@ -101,9 +101,9 @@ export class TimeTracker {
       timestamp: new Date(),
       data
     }
-    
+
     this.interactions.push(interaction)
-    
+
     // If we're tracking a question, log the interaction
     if (this.questionId && this.sectionName) {
       this.logTimeData({
@@ -118,48 +118,24 @@ export class TimeTracker {
   }
 
   // Private method to send time data to backend
-  private async logTimeData(payload: {
+  // NOTE: We intentionally do NOT fire a network request per interaction.
+  // That would fire hundreds of requests per session (one per ball toggle),
+  // causing CORS errors and server overload on Render's free tier.
+  // Time tracking data is bundled into the ingest-phase payload at phase completion instead.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private logTimeData(_payload: {
     sectionName?: string
     questionId?: number
     timeData: any
     interactionType?: string
   }) {
-    // Skip if we're on the server side
-    if (typeof window === 'undefined') return
-    
-    if (!this.participantId) {
-      console.warn('[TimeTracker] No participant ID available for logging')
-      return
-    }
-
-    try {
-      const API_BASE = process.env.NODE_ENV === 'production' 
-        ? "https://knapsack-expirement.onrender.com"
-        : "http://localhost:8787"
-
-      const response = await fetch(`${API_BASE}/api/v1/log-time`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          participantId: this.participantId,
-          ...payload
-        })
-      })
-
-      if (!response.ok) {
-        console.error('[TimeTracker] Failed to log time data:', response.status)
-      }
-    } catch (error) {
-      console.error('[TimeTracker] Error logging time data:', error)
-    }
+    // intentional no-op
   }
 
   // Get current timing info
   getCurrentTime() {
     if (!this.startTime) return null
-    
+
     const now = new Date()
     return {
       startTime: this.startTime,
