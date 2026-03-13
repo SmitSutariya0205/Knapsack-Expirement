@@ -216,10 +216,12 @@ export function getSkillTestQuestions(): Question[] {
   const shuffledHard = shuffle(questions.hard);
 
   // Return in order: all easy, then all medium, then all hard
+  // Easy and Medium natively satisfy their dominance definitions.
+  // We strictly enforce zero-dominance for Hard questions.
   return [
     ...shuffledEasy.slice(0, 3),
     ...shuffledMedium.slice(0, 4),
-    ...shuffledHard.slice(0, 3)
+    ...shuffledHard.slice(0, 3).map(enforceHardDominance)
   ];
 }
 
