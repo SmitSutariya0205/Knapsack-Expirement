@@ -13,6 +13,7 @@ const TutorialPhase = lazy(() => import("@/components/phases/tutorial-phase"))
 const TrainingPhase1 = lazy(() => import("@/components/phases/training-phase-1"))
 const TrainingPhase2 = lazy(() => import("@/components/phases/training-phase-2"))
 const TransitionPhase = lazy(() => import("@/components/phases/transition-phase"))
+const RandomizedInstructionsPhase = lazy(() => import("@/components/phases/randomized-instructions-phase"))
 const BenchmarkPhase = lazy(() => import("@/components/phases/benchmark-phase"))
 const PredictionPhase = lazy(() => import("@/components/phases/prediction-phase"))
 const ResultsPhase = lazy(() => import("@/components/phases/results-phase"))
@@ -33,6 +34,7 @@ const phases = [
   { id: "training1", name: "Practice", icon: Target, color: "bg-yellow-500" },
   { id: "training2", name: "Test 1", icon: Clock, color: "bg-orange-500" },
   { id: "transition", name: "Instructions", icon: AlertCircle, color: "bg-indigo-500" },
+  { id: "randomized-instructions", name: "Test Format", icon: Target, color: "bg-indigo-500" },
   { id: "benchmark", name: "Test 2", icon: Trophy, color: "bg-purple-500" },
   { id: "prediction", name: "Test 3", icon: Target, color: "bg-red-500" },
   { id: "results", name: "Results", icon: Gift, color: "bg-emerald-500" },
@@ -287,6 +289,8 @@ export default function KnapsackExperiment() {
         return <TrainingPhase2 {...phaseProps} />
       case "transition":
         return <TransitionPhase onNext={nextPhase} />
+      case "randomized-instructions":
+        return <RandomizedInstructionsPhase onNext={nextPhase} />
       case "benchmark":
         return <BenchmarkPhase {...phaseProps} />
       case "prediction":
