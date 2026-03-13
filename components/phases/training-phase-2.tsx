@@ -209,6 +209,26 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
     return `${mins}:${secs.toString().padStart(2, "0")}`
   }
 
+  const question = skillsQuestions[currentQuestion]
+
+  const shuffledQuestion = useMemo(() => {
+    if (!question) return question;
+
+    // Create a shallow copy of the question
+    const qCopy = { ...question };
+
+    // Create a shallow copy of the balls array and shuffle it
+    // Using Fisher-Yates logic
+    const shuffledBalls = [...qCopy.balls];
+    for (let i = shuffledBalls.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledBalls[i], shuffledBalls[j]] = [shuffledBalls[j], shuffledBalls[i]];
+    }
+
+    qCopy.balls = shuffledBalls;
+    return qCopy;
+  }, [question]);
+
   // Guard: Don't render question UI if questions haven't loaded yet
   if (skillsQuestions.length === 0) {
     return (
@@ -228,7 +248,6 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
     )
   }
 
-  const question = skillsQuestions[currentQuestion]
   const progress = ((currentQuestion + 1) / skillsQuestions.length) * 100
   const difficultyColor = {
     easy: "bg-green-500",
@@ -387,24 +406,6 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
       </div>
     )
   }
-
-  const shuffledQuestion = useMemo(() => {
-    if (!question) return question;
-
-    // Create a shallow copy of the question
-    const qCopy = { ...question };
-
-    // Create a shallow copy of the balls array and shuffle it
-    // Using Fisher-Yates logic
-    const shuffledBalls = [...qCopy.balls];
-    for (let i = shuffledBalls.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledBalls[i], shuffledBalls[j]] = [shuffledBalls[j], shuffledBalls[i]];
-    }
-
-    qCopy.balls = shuffledBalls;
-    return qCopy;
-  }, [question]);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
