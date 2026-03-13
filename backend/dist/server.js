@@ -8,19 +8,23 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const db_1 = require("./db");
 const participantRoutes_1 = require("./routes/participantRoutes");
+const authRoutes_1 = require("./routes/authRoutes");
 const app = (0, express_1.default)();
 const port = Number(process.env.PORT || 8787);
 app.use((0, cors_1.default)({
     origin: [
         'https://arjav5090.github.io',
+        'https://smitsutariya0205.github.io',
         'http://localhost:3000',
         'http://localhost:3001',
         ...(process.env.CORS_ORIGIN?.split(',') ?? [])
     ],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-key']
 }));
 app.use(express_1.default.json({ limit: '2mb' }));
 app.use(participantRoutes_1.router);
+app.use(authRoutes_1.router);
 // routes
 app.get('/health', (_, res) => res.json({ ok: true }));
 app.listen(port, async () => {

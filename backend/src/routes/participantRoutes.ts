@@ -248,15 +248,6 @@ router.post('/api/v1/ingest-phase', async (req, res) => {
   }
 
   try {
-    // First verify participant exists
-    const participant = await prisma.participant.findFirst({
-      where: { participantId }
-    })
-    if (!participant) {
-      console.error(`[INGEST ERROR] Participant not found: ${participantId}`)
-      return res.status(404).json({ error: "Participant not found" })
-    }
-
     console.log(`[INGEST] Storing data for participant ${participantId}, phase: ${phase}`)
 
     // Map phase to the correct field
@@ -290,18 +281,20 @@ router.post('/api/v1/ingest-phase', async (req, res) => {
 
     const updated = await prisma.participant.update({
       where: { participantId },
-      data: updateData
+      data: updateData,
+      select: { participantId: true } // Only select ID to prevent pulling huge JSON columns into memory
     })
 
-    if (!updated) {
-      console.error(`[INGEST ERROR] Failed to update participant: ${participantId}`)
+    console.log(`[INGEST SUCCESS] Data stored for participant ${participantId}, phase: ${phase}`)
+    return res.status(200).json({ success: true })
+
+  } catch (err: any) {
+    // Handle Prisma "Record to update not found" error efficiently
+    if (err.code === 'P2025') {
+      console.error(`[INGEST ERROR] Participant not found for update: ${participantId}`)
       return res.status(404).json({ error: "Participant not found" })
     }
 
-    console.log(`[INGEST SUCCESS] Data stored for participant ${participantId}, phase: ${phase}`)
-    return res.status(200).json({ success: true, updated })
-
-  } catch (err) {
     console.error('[INGEST ERROR]', err)
     return res.status(500).json({ error: 'Failed to ingest phase data' })
   }
