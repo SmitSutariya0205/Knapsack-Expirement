@@ -95,10 +95,11 @@ export default function ResultsPhase({ onNext, participantData }: ResultsPhasePr
   const notUsedTestName = useBenchmark ? "Test 3 (Final)" : "Test 2 (Benchmark)"
   const notUsedTestPoints = useBenchmark ? finalPoints : benchmarkPoints
   
-  // Overall performance = Skills Assessment + (Better of Benchmark OR Final Test)
-  const totalPoints = (training2.totalPoints || 0) + (testForOverall.totalPoints || 0)
-  const maxTotalPoints = (training2.maxPoints || 20) + (testForOverall.maxPoints || 60)
-  const overallPercentage = maxTotalPoints > 0 ? (totalPoints / maxTotalPoints) * 100 : 0
+  // Overall performance = Skills Assessment + (Better of Benchmark OR Final Test) + 20 Completion Bonus
+  const basePoints = (training2.totalPoints || 0) + (testForOverall.totalPoints || 0)
+  const totalPoints = basePoints + 20
+  const maxTotalPoints = 100 // Fixed max points (20 + 60 + 20 bonus = 100)
+  const overallPercentage = (totalPoints / maxTotalPoints) * 100
 
 
 
@@ -249,13 +250,12 @@ export default function ResultsPhase({ onNext, participantData }: ResultsPhasePr
               {/* Written Explanation */}
               <div className="mt-4 pt-4 border-t border-blue-200">
                 <div className="bg-white rounded-lg p-4 space-y-2">
-                  <h4 className="font-semibold text-sm text-gray-800 mb-2">How Overall Performance is Calculated:</h4>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-2">How Probability Points are Calculated:</h4>
                   <p className="text-xs text-gray-700 leading-relaxed">
-                    Your overall performance score is calculated by combining your <strong>Test 1 (Skills Assessment)</strong> points 
-                    ({training2.totalPoints || 0} out of {training2.maxPoints || 20} points) with your <strong>{testNameForOverall}</strong> points 
-                    ({testForOverall.totalPoints || 0} out of {testForOverall.maxPoints || 60} points). 
-                    This gives you a total of <strong>{totalPoints} out of {maxTotalPoints} points</strong>, 
-                    representing <strong>{overallPercentage.toFixed(1)}%</strong> of the maximum possible score.
+                    Your final score is calculated by combining your <strong>Test 1 (Skills Assessment)</strong> points 
+                    ({training2.totalPoints || 0} points) with your <strong>{testNameForOverall}</strong> points 
+                    ({testForOverall.totalPoints || 0} points). Finally, we add <strong>20 bonus points</strong> as a completion gift for finishing the experiment!
+                    This gives you a total of <strong>{totalPoints} out of {maxTotalPoints} points</strong>.
                   </p>
                   <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
                     <p className="text-xs text-yellow-800">
@@ -265,8 +265,7 @@ export default function ResultsPhase({ onNext, participantData }: ResultsPhasePr
                     </p>
                   </div>
                   <p className="text-xs text-gray-600 mt-2 italic">
-                    Note: Your final score uses Test 1 (Skills) + the better score between Test 2 (Benchmark) and Test 3 (Final), 
-                    ensuring you receive credit for your best performance.
+                    Note: Your final score uses Test 1 (Skills) + the better score between Test 2 (Benchmark) and Test 3 (Final) + 20 Completion Bonus Points.
                   </p>
                 </div>
               </div>
