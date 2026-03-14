@@ -30,7 +30,7 @@ export default function ResultsPhase({ onNext, participantData }: ResultsPhasePr
           
           if (participantId && prolificPid) {
             const API_BASE = process.env.NODE_ENV === 'production' 
-              ? "https://knapsack-expirement.onrender.com"
+              ? "https://knapsack-expirement-3f13.onrender.com"
               : "http://localhost:8787"
 
             // Retry up to 3 times to handle Render cold starts
