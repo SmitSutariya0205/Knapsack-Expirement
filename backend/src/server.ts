@@ -16,20 +16,23 @@ const ALLOWED_ORIGINS = [
 ];
 
 // MANUAL CORS — do NOT use the 'cors' npm package (Render/Cloudflare strips its headers)
+// Use res.setHeader to bypass any middleware interference
 app.use((req, res, next) => {
   const origin = req.headers.origin as string | undefined;
 
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
-  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Vary', 'Origin');
 
   if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+    res.setHeader('Content-Length', '0');
+    res.writeHead(204);
+    return res.end();
   }
 
   next();
