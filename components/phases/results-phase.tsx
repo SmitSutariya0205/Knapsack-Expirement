@@ -110,7 +110,7 @@ export default function ResultsPhase({ onNext, participantData }: ResultsPhasePr
           <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center mb-4">
             <Trophy className="h-10 w-10 text-white" />
           </div>
-          <CardTitle className="text-3xl font-bold text-gray-900">Experiment Complete!</CardTitle>
+          <CardTitle className="text-3xl font-bold text-gray-900">Performance Summary</CardTitle>
           <p className="text-lg text-gray-600 mt-2">Thank you for participating in the Knapsack Challenge</p>
         </CardHeader>
       </Card>
