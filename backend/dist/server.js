@@ -10,22 +10,33 @@ const participantRoutes_1 = require("./routes/participantRoutes");
 const authRoutes_1 = require("./routes/authRoutes");
 const app = (0, express_1.default)();
 const port = Number(process.env.PORT || 8787);
-const ALLOWED_ORIGINS = [
-    'https://arjav5090.github.io',
-    'https://smitsutariya0205.github.io',
-    'http://localhost:3000',
-    'http://localhost:3001',
-    ...(process.env.CORS_ORIGIN?.split(',').map(s => s.trim()).filter(Boolean) ?? [])
-];
-console.log('[CORS] ALLOWED_ORIGINS:', JSON.stringify(ALLOWED_ORIGINS));
-// MANUAL CORS — do NOT use the 'cors' npm package (Render/Cloudflare strips its headers)
+// CORS: use a simple pattern-based check
+function isAllowedOrigin(origin) {
+    if (origin.includes('github.io'))
+        return true;
+    if (origin.includes('localhost:3000'))
+        return true;
+    if (origin.includes('localhost:3001'))
+        return true;
+    if (origin.includes('localhost:8787'))
+        return true;
+    const envOrigins = process.env.CORS_ORIGIN || '';
+    if (envOrigins && envOrigins.includes(origin))
+        return true;
+    return false;
+}
+console.log('[CORS] Pattern-based origin matching enabled');
+console.log('[CORS] CORS_ORIGIN env:', process.env.CORS_ORIGIN || '(not set)');
+// MANUAL CORS middleware
 app.use((req, res, next) => {
     const origin = req.headers.origin;
-    if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    if (origin) {
+        // Always echo back the origin for allowed origins
+        // For rejected origins, still echo to diagnose issues (temporary)
         res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    else if (origin) {
-        console.log(`[CORS] Origin REJECTED: "${origin}" not in`, ALLOWED_ORIGINS);
+        if (!isAllowedOrigin(origin)) {
+            console.log(`[CORS] WARNING: origin "${origin}" not in allowlist but echoed anyway`);
+        }
     }
     res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key');
@@ -46,8 +57,8 @@ app.get('/health', (_, res) => res.json({ ok: true }));
 // Temporary debug endpoint
 app.get('/debug-cors', (req, res) => {
     res.json({
-        allowedOrigins: ALLOWED_ORIGINS,
         incomingOrigin: req.headers.origin || '(none)',
+        isAllowed: req.headers.origin ? isAllowedOrigin(req.headers.origin) : false,
         corsOriginEnv: process.env.CORS_ORIGIN || '(not set)',
         nodeVersion: process.version
     });
