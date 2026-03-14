@@ -196,11 +196,11 @@ export function getPracticeQuestions(): Question[] {
   // We map them through enforceHardDominance to perfectly satisfy the rule just for Practice.
   const practiceHard = shuffle(questions.hard).slice(0, 2).map(enforceHardDominance);
 
-  return [
+  return shuffle([
     ...practiceEasy,
     ...practiceMedium,
     ...practiceHard
-  ];
+  ]);
 }
 
 /**
