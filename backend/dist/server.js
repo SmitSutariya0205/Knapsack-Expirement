@@ -10,32 +10,27 @@ const participantRoutes_1 = require("./routes/participantRoutes");
 const authRoutes_1 = require("./routes/authRoutes");
 const app = (0, express_1.default)();
 const port = Number(process.env.PORT || 8787);
-// MANUAL CORS INJECTION FOR RENDER
-// Using standard explicit manual headers because the 'cors' package gets blocked during preflight
+const ALLOWED_ORIGINS = [
+    'https://arjav5090.github.io',
+    'https://smitsutariya0205.github.io',
+    'http://localhost:3000',
+    'http://localhost:3001',
+    ...(process.env.CORS_ORIGIN?.split(',') ?? [])
+];
+// MANUAL CORS — do NOT use the 'cors' npm package (Render/Cloudflare strips its headers)
 app.use((req, res, next) => {
-    const allowedOrigins = [
-        'https://arjav5090.github.io',
-        'https://smitsutariya0205.github.io',
-        'http://localhost:3000',
-        'http://localhost:3001',
-        ...(process.env.CORS_ORIGIN?.split(',') ?? [])
-    ];
     const origin = req.headers.origin;
-    if (origin && allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
+    if (origin && ALLOWED_ORIGINS.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
     }
-    else if (allowedOrigins.length > 0) {
-        res.setHeader('Access-Control-Allow-Origin', allowedOrigins[0]);
-    }
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-admin-key');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Vary', 'Origin');
     if (req.method === 'OPTIONS') {
-        res.sendStatus(200);
+        return res.status(204).end();
     }
-    else {
-        next();
-    }
+    next();
 });
 app.use(express_1.default.json({ limit: '2mb' }));
 app.use(participantRoutes_1.router);
