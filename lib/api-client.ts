@@ -16,7 +16,7 @@ export const getApiBase = () => {
   if (typeof window === 'undefined') return 'http://localhost:8787'
   return process.env.NEXT_PUBLIC_API_BASE ||
     (process.env.NODE_ENV === 'production'
-      ? "https://knapsack-expirement.onrender.com"
+      ? "https://knapsack-expirement-3f13.onrender.com"
       : "http://localhost:8787")
 }
 
