@@ -228,7 +228,7 @@ export default function ResultsPhase({ onNext, participantData }: ResultsPhasePr
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center text-lg">
               <Star className="h-5 w-5 mr-2 text-blue-600" />
-              Overall Performance
+              Probability Points Gained
             </CardTitle>
           </CardHeader>
           <CardContent>
