@@ -332,27 +332,18 @@ export default function ResultsPhase({ onNext, participantData }: ResultsPhasePr
 
           <div className="text-center pt-6">
             <Button 
-              onClick={() => {
-                // Clear localStorage to prevent re-access
-                localStorage.removeItem('participantId')
-                localStorage.removeItem('prolificPid')
-                
-                // Redirect to Prolific completion page
-                const completionUrl = `https://app.prolific.co/submissions/complete?cc=KNAPSACK2024`
-                window.location.href = completionUrl
-              }}
+              onClick={onNext}
               size="lg"
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition-all duration-200"
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition-all duration-200"
             >
               <Gift className="h-5 w-5 mr-2" />
-              Complete Study & Return to Prolific
+              Continue to Reward Game
             </Button>
           </div>
 
           <div className="text-center pt-4">
             <p className="text-sm text-gray-500">
-              All data collected is anonymized and will be used solely for research purposes. Thank you for your
-              valuable participation!
+              Your experiment results have been saved. Proceed to the next page to claim your bonus reward!
             </p>
           </div>
         </CardContent>

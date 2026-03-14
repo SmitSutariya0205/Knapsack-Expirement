@@ -17,6 +17,7 @@ const RandomizedInstructionsPhase = lazy(() => import("@/components/phases/rando
 const BenchmarkPhase = lazy(() => import("@/components/phases/benchmark-phase"))
 const PredictionPhase = lazy(() => import("@/components/phases/prediction-phase"))
 const ResultsPhase = lazy(() => import("@/components/phases/results-phase"))
+const RewardPhase = lazy(() => import("@/components/phases/reward-phase"))
 
 // Loading component for lazy loaded phases
 const PhaseLoader = () => (
@@ -38,6 +39,7 @@ const phases = [
   { id: "benchmark", name: "Test 2", icon: Trophy, color: "bg-purple-500" },
   { id: "prediction", name: "Test 3", icon: Target, color: "bg-red-500" },
   { id: "results", name: "Results", icon: Gift, color: "bg-emerald-500" },
+  { id: "reward", name: "Reward", icon: Gift, color: "bg-teal-500" },
 ]
 
 export default function KnapsackExperiment() {
@@ -297,6 +299,8 @@ export default function KnapsackExperiment() {
         return <PredictionPhase {...phaseProps} />
       case "results":
         return <ResultsPhase {...phaseProps} />
+      case "reward":
+        return <RewardPhase {...phaseProps} />
       default:
         return <IntroPhase {...phaseProps} />
     }
