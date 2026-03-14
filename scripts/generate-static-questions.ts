@@ -320,8 +320,12 @@ function createDominancePattern(
 
   // Create a randomized base for the lowest weight and highest reward
   // to avoid hardcoding the exact same boundary values every time.
-  const baseWeightOffset = rng.range(0, Math.floor((config.maxWeight - config.minWeight) / 3));
-  const baseRewardOffset = rng.range(0, Math.floor((config.maxReward - config.minReward) / 3));
+  const wRange = config.maxWeight - config.minWeight;
+  const rRange = config.maxReward - config.minReward;
+  
+  // Allow wider starting points if the range permits
+  const baseWeightOffset = rng.range(0, Math.max(1, Math.floor(wRange / 2)));
+  const baseRewardOffset = rng.range(0, Math.max(1, Math.floor(rRange / 2)));
 
   const baseWeight = config.minWeight + baseWeightOffset;
   const baseReward = config.maxReward - baseRewardOffset;
@@ -331,12 +335,18 @@ function createDominancePattern(
       // Create fully dominated chain with some randomness for variety
       for (let i = 0; i < NUM_BALLS; i++) {
         // Add random variation to weights and rewards while maintaining dominance
-        const weightVariation = rng.range(0, 1);
-        const rewardVariation = rng.range(0, 2);
+        const weightStep = rng.range(1, 2);
+        const rewardStep = rng.range(2, 4);
+        
+        // We accumulate the steps to ensure strict monotonic properties 
+        // rather than just multiplying by 'i' which creates rigid lines
+        const prevWeight = i > 0 ? items[i - 1].weight : baseWeight - weightStep;
+        const prevReward = i > 0 ? items[i - 1].reward : baseReward + rewardStep;
+        
         items.push({
           id: i + 1,
-          weight: baseWeight + i * 2 + weightVariation,
-          reward: baseReward - i * 3 - rewardVariation,
+          weight: Math.min(config.maxWeight, prevWeight + weightStep),
+          reward: Math.max(config.minReward, prevReward - rewardStep),
           color: BALL_COLORS[i % BALL_COLORS.length]
         });
       }
@@ -349,8 +359,14 @@ function createDominancePattern(
 
         if (i < Math.floor(NUM_BALLS / 2)) {
           // One half forms a dominance chain
-          weight = baseWeight + i * 2;
-          reward = baseReward - i * 2;
+          const weightStep = rng.range(1, 3);
+          const rewardStep = rng.range(1, 3);
+          
+          const prevWeight = i > 0 ? items[i - 1].weight : baseWeight - weightStep;
+          const prevReward = i > 0 ? items[i - 1].reward : baseReward + rewardStep;
+          
+          weight = Math.min(config.maxWeight, prevWeight + weightStep);
+          reward = Math.max(config.minReward, prevReward - rewardStep);
         } else {
           // Other half is completely random within constraints
           weight = rng.range(config.minWeight, config.maxWeight);
