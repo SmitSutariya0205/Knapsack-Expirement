@@ -1,6 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,66 +14,6 @@ interface ResultsPhaseProps {
 }
 
 export default function ResultsPhase({ onNext, participantData }: ResultsPhaseProps) {
-  const [hasMarkedComplete, setHasMarkedComplete] = useState(false)
-
-  // Auto-complete the study when Results phase loads
-  useEffect(() => {
-    if (!hasMarkedComplete) {
-      setHasMarkedComplete(true)
-      
-      // Mark participant as completed in the backend
-      const markStudyComplete = async () => {
-        try {
-          const participantId = localStorage.getItem('participantId')
-          const prolificPid = localStorage.getItem('prolificPid')
-          
-          if (participantId && prolificPid) {
-            const API_BASE = process.env.NODE_ENV === 'production' 
-              ? "https://knapsack-expirement-3f13.onrender.com"
-              : "http://localhost:8787"
-
-            // Retry up to 3 times to handle Render cold starts
-            for (let attempt = 1; attempt <= 3; attempt++) {
-              try {
-                const controller = new AbortController()
-                const timeoutId = setTimeout(() => controller.abort(), 30000)
-                
-                const res = await fetch(`${API_BASE}/api/v1/complete-participant`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({
-                    participantId,
-                    prolificPid,
-                    completedAt: new Date().toISOString()
-                  }),
-                  signal: controller.signal
-                })
-                
-                clearTimeout(timeoutId)
-                
-                if (res.ok) {
-                  console.log("[Results] Marked participant as completed")
-                  break // success, stop retrying
-                }
-                console.warn(`[Results] complete-participant attempt ${attempt} got status ${res.status}`)
-              } catch (retryError) {
-                console.warn(`[Results] complete-participant attempt ${attempt} failed:`, retryError)
-                if (attempt < 3) {
-                  await new Promise(r => setTimeout(r, attempt * 2000)) // wait 2s, 4s before retrying
-                }
-              }
-            }
-          }
-        } catch (error) {
-          console.error("[Results] Failed to mark participant as completed:", error)
-        }
-      }
-      
-      markStudyComplete()
-    }
-  }, [hasMarkedComplete])
 
   // Calculate total performance
   const training1 = participantData.training1 || { correctAnswers: 0, totalQuestions: 6, accuracy: 0 }
