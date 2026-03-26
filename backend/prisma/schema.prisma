@@ -28,7 +28,6 @@ model Participant {
   testPractice      Json?
   testSkill         Json?
   testBenchmark     Json?
-  testStrategy      Json?
   testFinal         Json?
   
   // Time tracking stored as JSON

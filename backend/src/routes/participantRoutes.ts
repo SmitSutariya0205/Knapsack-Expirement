@@ -16,7 +16,6 @@ interface Participant {
   testPractice: any
   testSkill: any
   testBenchmark: any
-  testStrategy: any
   testFinal: any
   timeTracking: any
   email: string | null
@@ -25,7 +24,7 @@ interface Participant {
 export const router = express.Router()
 
 // Zod schemas
-const TestPhase = z.enum(['practice', 'skill', 'benchmark', 'strategy', 'final'])
+const TestPhase = z.enum(['practice', 'skill', 'benchmark', 'final'])
 
 // REGISTER a new participant
 router.post('/api/v1/register', async (req, res) => {
@@ -62,12 +61,11 @@ router.get('/api/v1/check-participant/:prolificPid', async (req, res) => {
     }
 
     // Check if participant has completed all required phases
-    const requiredPhases = ['practice', 'skill', 'benchmark', 'strategy', 'final'] as const
+    const requiredPhases = ['practice', 'skill', 'benchmark', 'final'] as const
     const tests: any = {
       practice: participant.testPractice,
       skill: participant.testSkill,
       benchmark: participant.testBenchmark,
-      strategy: participant.testStrategy,
       final: participant.testFinal
     }
 
@@ -255,7 +253,6 @@ router.post('/api/v1/ingest-phase', async (req, res) => {
       practice: 'testPractice',
       skill: 'testSkill',
       benchmark: 'testBenchmark',
-      strategy: 'testStrategy',
       final: 'testFinal'
     }
 
@@ -321,7 +318,6 @@ router.get('/api/v1/export-prolific-data', async (req, res) => {
         practice: p.testPractice,
         skill: p.testSkill,
         benchmark: p.testBenchmark,
-        strategy: p.testStrategy,
         final: p.testFinal
       }
     }))
@@ -492,7 +488,6 @@ router.get('/api/v1/participant-analytics/:participantId', async (req, res) => {
         practice: participant.testPractice,
         skill: participant.testSkill,
         benchmark: participant.testBenchmark,
-        strategy: participant.testStrategy,
         final: participant.testFinal
       }
     }
@@ -528,18 +523,16 @@ router.get('/api/v1/study-stats', async (req, res) => {
         testPractice: true,
         testSkill: true,
         testBenchmark: true,
-        testStrategy: true,
         testFinal: true
       }
     })
 
-    let practiceCount = 0, skillCount = 0, benchmarkCount = 0, strategyCount = 0, finalCount = 0
+    let practiceCount = 0, skillCount = 0, benchmarkCount = 0, finalCount = 0
 
     participants.forEach((p: any) => {
       if ((p.testPractice as any)?.completed) practiceCount++
       if ((p.testSkill as any)?.completed) skillCount++
       if ((p.testBenchmark as any)?.completed) benchmarkCount++
-      if ((p.testStrategy as any)?.completed) strategyCount++
       if ((p.testFinal as any)?.completed) finalCount++
     })
 
@@ -550,7 +543,6 @@ router.get('/api/v1/study-stats', async (req, res) => {
         practice: practiceCount,
         skill: skillCount,
         benchmark: benchmarkCount,
-        strategy: strategyCount,
         final: finalCount
       },
       completionRate: totalParticipants > 0 ? (completedParticipants / totalParticipants * 100).toFixed(1) : 0
@@ -608,10 +600,6 @@ router.get('/api/v1/admin/export-csv', adminAuth, async (req, res) => {
       'Benchmark Completed',
       'Benchmark Accuracy',
       'Benchmark Score',
-      // Strategy
-      'Strategy Completed',
-      'Strategy Questions Answered',
-      'Strategy Time Used',
       // Final
       'Final Completed',
       'Final Accuracy',
@@ -624,7 +612,6 @@ router.get('/api/v1/admin/export-csv', adminAuth, async (req, res) => {
       const practice = p.testPractice || {}
       const skill = p.testSkill || {}
       const benchmark = p.testBenchmark || {}
-      const strategy = p.testStrategy || {}
       const final = p.testFinal || {}
 
       const formatDate = (d: Date | null) => d ? new Date(d).toISOString() : ''
@@ -651,10 +638,6 @@ router.get('/api/v1/admin/export-csv', adminAuth, async (req, res) => {
         safeBool(benchmark.completed),
         safeNum(benchmark.accuracy),
         safeNum(benchmark.totalPoints),
-        // Strategy
-        safeBool(strategy.completed),
-        safeNum(strategy.questionsAnswered),
-        safeNum(strategy.timeUsed) / 1000, // Seconds
         // Final
         safeBool(final.completed),
         safeNum(final.accuracy),
@@ -684,14 +667,13 @@ router.get('/api/v1/admin/analytics', adminAuth, async (req, res) => {
     })
 
     // Calculate comprehensive analytics
-    const requiredPhases = ['practice', 'skill', 'benchmark', 'strategy', 'final']
+    const requiredPhases = ['practice', 'skill', 'benchmark', 'final']
 
     const completedParticipants = participants.filter((p: Participant) => {
       const tests: any = {
         practice: p.testPractice,
         skill: p.testSkill,
         benchmark: p.testBenchmark,
-        strategy: p.testStrategy,
         final: p.testFinal
       }
       const completedPhases = requiredPhases.filter(phase =>
@@ -741,14 +723,6 @@ router.get('/api/v1/admin/analytics', adminAuth, async (req, res) => {
               accuracy: (p.testBenchmark as any).accuracy,
               correctAnswers: (p.testBenchmark as any).correctAnswers,
               totalQuestions: (p.testBenchmark as any).totalQuestions
-            } : null,
-            strategy: p.testStrategy ? {
-              completed: (p.testStrategy as any).completed,
-              answers: (p.testStrategy as any).answers,
-              questionsAnswered: (p.testStrategy as any).questionsAnswered,
-              totalQuestions: (p.testStrategy as any).totalQuestions,
-              timeUsed: (p.testStrategy as any).timeUsed,
-              questionTimes: (p.testStrategy as any).questionTimes
             } : null,
             final: p.testFinal ? {
               completed: (p.testFinal as any).completed,
@@ -837,7 +811,6 @@ router.get('/api/v1/admin/participant/:participantId', adminAuth, async (req, re
         practice: participant.testPractice,
         skill: participant.testSkill,
         benchmark: participant.testBenchmark,
-        strategy: participant.testStrategy,
         final: participant.testFinal
       },
       detailedTimeAnalysis: {
