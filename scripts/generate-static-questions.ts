@@ -353,32 +353,68 @@ function createDominancePattern(
       break;
 
     case 'partial':
-      for (let i = 0; i < NUM_BALLS; i++) {
-        let weight: number;
-        let reward: number;
+      // Medium difficulty: guarantee one MAXIMAL ball (dominates all) and one MINIMAL ball (dominated by all)
+      // Middle balls have trade-offs among themselves (no mutual dominance)
+      {
+        // 1. Create the MAXIMAL ball: lowest weight, highest reward → dominates everything
+        const maximalWeight = config.minWeight;
+        const maximalReward = config.maxReward;
 
-        if (i < Math.floor(NUM_BALLS / 2)) {
-          // One half forms a dominance chain
-          const weightStep = rng.range(1, 3);
-          const rewardStep = rng.range(1, 3);
-          
-          const prevWeight = i > 0 ? items[i - 1].weight : baseWeight - weightStep;
-          const prevReward = i > 0 ? items[i - 1].reward : baseReward + rewardStep;
-          
-          weight = Math.min(config.maxWeight, prevWeight + weightStep);
-          reward = Math.max(config.minReward, prevReward - rewardStep);
-        } else {
-          // Other half is completely random within constraints
-          weight = rng.range(config.minWeight, config.maxWeight);
-          reward = rng.range(config.minReward, config.maxReward);
+        // 2. Create the MINIMAL ball: highest weight, lowest reward → dominated by everything
+        const minimalWeight = config.maxWeight;
+        const minimalReward = config.minReward;
+
+        // 3. Create middle balls with weights and rewards strictly between maximal and minimal
+        // To ensure maximal dominates them: middleWeight > maximalWeight AND middleReward < maximalReward
+        // To ensure they dominate minimal: middleWeight < minimalWeight AND middleReward > minimalReward
+        // To ensure NO mutual dominance among middle balls: create trade-offs
+        //   (if one middle ball has lower weight, give it lower reward too)
+        const middleBalls: Ball[] = [];
+        const middleCount = NUM_BALLS - 2;
+
+        for (let i = 0; i < middleCount; i++) {
+          // Spread weights and rewards across the range between maximal and minimal
+          // Use opposing gradients: as weight increases, reward also increases (creates trade-offs)
+          const t = (i + 1) / (middleCount + 1); // evenly spaced ratio (0, 1)
+
+          const weightRange = minimalWeight - maximalWeight - 2; // leave room for strict inequalities
+          const rewardRange = maximalReward - minimalReward - 2;
+
+          let middleWeight = maximalWeight + 1 + Math.floor(t * weightRange) + rng.range(0, 1);
+          let middleReward = minimalReward + 1 + Math.floor(t * rewardRange) + rng.range(0, 1);
+
+          // Clamp to valid range (strictly between maximal and minimal)
+          middleWeight = Math.max(maximalWeight + 1, Math.min(minimalWeight - 1, middleWeight));
+          middleReward = Math.max(minimalReward + 1, Math.min(maximalReward - 1, middleReward));
+
+          middleBalls.push({
+            id: 0, // will be reassigned
+            weight: middleWeight,
+            reward: middleReward,
+            color: ''
+          });
         }
 
-        items.push({
-          id: i + 1,
-          weight,
-          reward,
-          color: BALL_COLORS[i % BALL_COLORS.length]
+        // Assemble all balls: maximal first, then middle (shuffled), then minimal
+        const allBalls: Ball[] = [
+          { id: 1, weight: maximalWeight, reward: maximalReward, color: BALL_COLORS[0] },
+          ...middleBalls,
+          { id: NUM_BALLS, weight: minimalWeight, reward: minimalReward, color: BALL_COLORS[NUM_BALLS - 1] }
+        ];
+
+        // Shuffle the order so maximal/minimal aren't always first/last
+        for (let i = allBalls.length - 1; i > 0; i--) {
+          const j = rng.range(0, i);
+          [allBalls[i], allBalls[j]] = [allBalls[j], allBalls[i]];
+        }
+
+        // Reassign IDs and colors after shuffle
+        allBalls.forEach((ball, idx) => {
+          ball.id = idx + 1;
+          ball.color = BALL_COLORS[idx % BALL_COLORS.length];
         });
+
+        items.push(...allBalls);
       }
       break;
 
