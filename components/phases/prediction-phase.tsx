@@ -407,42 +407,8 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
           <CardContent className="space-y-6">
             <div className="text-center">
               <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-8 rounded-xl">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Your Final Performance</h3>
-
-                <div className="grid md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-emerald-600">{correctAnswers}</div>
-                    <div className="text-sm text-gray-600">Correct</div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-amber-600">{unansweredQuestions}</div>
-                    <div className="text-sm text-gray-600">Unanswered</div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-rose-600">{incorrectAnswers}</div>
-                    <div className="text-sm text-gray-600">Incorrect</div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg shadow-sm border-2 border-teal-500">
-                    <div className="text-3xl font-bold text-teal-600">{totalPoints}/{maxPoints}</div>
-                    <div className="text-sm text-gray-600">Points Earned</div>
-                  </div>
-                </div>
-
-                <div className="bg-teal-100 border border-teal-300 rounded-lg p-4 mb-6">
-                  <p className="text-teal-800 font-medium">
-                    You completed the test with <strong>{totalPoints} out of {maxPoints}</strong> points!
-                  </p>
-                  <p className="text-teal-700 text-sm mt-2">
-                    Scoring: 2 points per correct answer, 1 point per unanswered question, 0 points per incorrect answer.
-                  </p>
-                  <p className="text-teal-700 text-sm mt-1">
-                    Thank you for participating in this study.
-                  </p>
-                </div>
-
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Thank you for completing the final test!</h3>
+                <p className="text-lg text-gray-600 mb-6">Click below to continue.</p>
                 <Button onClick={onNext} size="lg">
                   Continue to Question Analysis
                 </Button>

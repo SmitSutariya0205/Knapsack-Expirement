@@ -334,39 +334,8 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
           <CardContent className="space-y-6">
             <div className="text-center">
               <div className="bg-gradient-to-r from-green-50 to-blue-50 p-8 rounded-xl">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Your Performance Summary</h3>
-
-                <div className="grid md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-green-600">{correctAnswers}</div>
-                    <div className="text-sm text-gray-600">Correct</div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-yellow-600">{unansweredQuestions}</div>
-                    <div className="text-sm text-gray-600">Unanswered</div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-red-600">{incorrectAnswers}</div>
-                    <div className="text-sm text-gray-600">Incorrect</div>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg shadow-sm border-2 border-blue-500">
-                    <div className="text-3xl font-bold text-blue-600">{totalPoints}/{maxPoints}</div>
-                    <div className="text-sm text-gray-600">Points Earned</div>
-                  </div>
-                </div>
-
-                <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-6">
-                  <p className="text-blue-800 font-medium">
-                    You earned <strong>{totalPoints} out of {maxPoints}</strong> points!
-                  </p>
-                  <p className="text-blue-700 text-sm mt-2">
-                    Scoring: 2 points per correct answer, 1 point per unanswered question, 0 points per incorrect answer.
-                  </p>
-                </div>
-
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Thank you for completing Test 1!</h3>
+                <p className="text-lg text-gray-600 mb-6">Click below to continue to the next test.</p>
                 <Button onClick={onNext} size="lg">
                   Continue to Test 2
                 </Button>
