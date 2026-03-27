@@ -494,7 +494,7 @@ function generateKnapsackQuestion(
     }
 
     const metadata = analyzeDifficulty(items, capacity, solution.solution);
-    const explanation = `The optimal selection maximizes reward (${solution.maxReward}) while staying within capacity (${solution.solutionWeight}/${capacity}).`;
+    const explanation = `The optimal selection maximizes points (${solution.maxReward}) while staying within capacity (${solution.solutionWeight}/${capacity}).`;
 
     return {
       id,

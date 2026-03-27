@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, Package, Coins, Weight, HelpCircle, Target, DollarSign, CheckCircle, AlertCircle, XCircle } from "lucide-react"
+import { ArrowRight, Package, Coins, Weight, HelpCircle, Target, CheckCircle, AlertCircle, XCircle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import KnapsackQuestion from "@/components/knapsack-question"
 
@@ -27,7 +27,7 @@ const sampleQuestions = [
       { id: 6, weight: 9, reward: 4, color: "bg-pink-500" }
     ],
     solution: [1, 2, 3, 4],
-    explanation: "Select balls 1, 2, 3 and 4 for a total weight of 12 (= capacity) and maximum reward of 46 points.",
+    explanation: "Select balls 1, 2, 3 and 4 for a total weight of 12 (= capacity) and maximum points of 46.",
   },
   {
     id: 2,
@@ -41,7 +41,7 @@ const sampleQuestions = [
       { id: 6, weight: 11, reward: 3, color: "bg-pink-500" }
     ],
     solution: [1, 2, 3, 4],
-    explanation: "Select balls 1, 2, 3 and 4 for a total weight of 16 (= capacity) and maximum reward of 48 points.",
+    explanation: "Select balls 1, 2, 3 and 4 for a total weight of 16 (= capacity) and maximum points of 48.",
   },
 ]
 
@@ -158,7 +158,7 @@ function DynamicExample() {
     } else if (newSelection.length > 0) {
       setFeedback({
         type: "suboptimal",
-        message: "Oops, some other combination will give you more reward!"
+        message: "Oops, some other combination will give you more points!"
       })
     } else {
       setFeedback({ type: "none", message: "" })
@@ -229,7 +229,7 @@ function DynamicExample() {
                 </div>
                 <div className="text-center">
                   <div className="font-bold text-sm">W: {ball.weight}</div>
-                  <div className="text-yellow-600 font-bold text-sm">R: {ball.reward}</div>
+                  <div className="text-yellow-600 font-bold text-sm">P: {ball.reward}</div>
                 </div>
                 {selectedBalls.includes(ball.id) && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
@@ -249,7 +249,7 @@ function DynamicExample() {
               </span>
             </div>
             <div className="flex justify-between items-center mt-1">
-              <span className="font-medium">Reward:</span>
+              <span className="font-medium">Points:</span>
               <span className="text-yellow-600 font-bold">{currentReward} points</span>
             </div>
           </div>
@@ -330,13 +330,13 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
             <div className="bg-gradient-to-r from-green-50 to-yellow-50 p-8 rounded-xl border-2 border-green-200">
               <div className="space-y-6">
                 <div className="flex items-center justify-center space-x-3">
-                  <DollarSign className="h-8 w-8 text-green-600" />
-                  <h2 className="text-3xl font-bold text-gray-900">Monetary Rewards</h2>
+                  <Target className="h-8 w-8 text-green-600" />
+                  <h2 className="text-3xl font-bold text-gray-900">Scoring System</h2>
                 </div>
 
                 <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                  <strong>The more questions you answer correctly, the higher monetary reward you will receive.</strong>
-                  Your performance directly impacts your compensation, so it pays to think carefully about each decision!
+                  <strong>The more questions you answer correctly, the higher your score will be.</strong>
+                  Your performance directly impacts your results, so think carefully about each decision!
                 </p>
 
                 <div className="bg-white p-4 rounded-lg shadow-sm max-w-lg mx-auto">
@@ -396,7 +396,7 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
                       <div className="flex items-center">
                         <Coins className="h-3 w-3 mr-2 text-yellow-500" />
                         <span className="text-xs">
-                          <strong>Reward (R):</strong> Points you earn
+                          <strong>Points (P):</strong> Points you earn
                         </span>
                       </div>
                     </div>
@@ -410,7 +410,7 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
                   </p>
                   <ul className="list-disc list-inside text-sm sm:text-base text-yellow-900 space-y-1">
                     <li>Select balls to be placed in the knapsack.</li>
-                    <li>Maximize the combined reward.</li>
+                    <li>Maximize the combined points.</li>
                     <li>Keep the total weight below the knapsack’s capacity.</li>
                   </ul>
                 </div>
@@ -437,8 +437,8 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
           <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-8 rounded-xl border-2 border-yellow-200">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Before showing you more knapsack problems, somethings to note:</h3>
             <ol className="text-lg text-gray-700 space-y-4 list-decimal list-inside ml-4">
-              <li><strong>No partial credit:</strong> you must achieve the highest possible reward while keeping combined weight under capacity for your answer to be considered correct</li>
-              <li>There is a weight/reward counter on every question to help you.</li>
+              <li><strong>No partial credit:</strong> you must achieve the highest possible points while keeping combined weight under capacity for your answer to be considered correct</li>
+              <li>There is a weight/points counter on every question to help you.</li>
             </ol>
           </div>
         </div>

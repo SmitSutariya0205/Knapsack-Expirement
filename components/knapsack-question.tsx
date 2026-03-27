@@ -231,7 +231,7 @@ export default function KnapsackQuestion({
                 <Coins className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-xs font-medium opacity-80">Total Reward</div>
+                <div className="text-xs font-medium opacity-80">Total Points</div>
                 <div className="text-2xl font-bold">{currentTotals.reward}</div>
               </div>
             </div>
@@ -309,7 +309,7 @@ export default function KnapsackQuestion({
                     <div className="text-center">
                       <div className="flex items-center justify-center space-x-2 mb-1">
                         <Coins className="h-5 w-5 text-amber-600" />
-                        <span className="text-sm font-medium text-amber-600">Reward</span>
+                        <span className="text-sm font-medium text-amber-600">Points</span>
                       </div>
                       <div className="text-2xl font-bold text-amber-600">
                         {ball.reward}
@@ -417,7 +417,7 @@ export default function KnapsackQuestion({
                 <div className="text-lg font-bold text-green-800">{solutionTotals.weight}/{question.capacity}</div>
               </div>
               <div className="bg-white rounded-xl p-3 text-center">
-                <div className="text-sm text-green-600 font-medium">Total Reward</div>
+                <div className="text-sm text-green-600 font-medium">Total Points</div>
                 <div className="text-lg font-bold text-green-800">{solutionTotals.reward}</div>
               </div>
             </div>
