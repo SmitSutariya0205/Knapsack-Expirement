@@ -326,27 +326,7 @@ export default function TutorialPhase({ onNext }: TutorialPhaseProps) {
                 </p>
               </div>
             </div>
-
-            <div className="bg-gradient-to-r from-green-50 to-yellow-50 p-8 rounded-xl border-2 border-green-200">
-              <div className="space-y-6">
-                <div className="flex items-center justify-center space-x-3">
-                  <Target className="h-8 w-8 text-green-600" />
-                  <h2 className="text-3xl font-bold text-gray-900">Scoring System</h2>
-                </div>
-
-                <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                  <strong>The more questions you answer correctly, the higher your score will be.</strong>
-                  Your performance directly impacts your results, so think carefully about each decision!
-                </p>
-
-                <div className="bg-white p-4 rounded-lg shadow-sm max-w-lg mx-auto">
-                  <p className="text-lg text-gray-600">
-                    📚 <strong>Don't worry!</strong> We will have opportunities to practice before results count.
-                  </p>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
       ),
     },
