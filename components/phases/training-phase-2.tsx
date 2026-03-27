@@ -286,24 +286,6 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
                       <li>• Auto-skip when timed out.</li>
                     </ul>
                   </div>
-
-                  <div className="bg-white p-6 rounded-lg">
-                    <h4 className="text-xl font-semibold mb-4 flex items-center">
-                      <Trophy className="h-5 w-5 mr-2" />
-                      Scoring
-                    </h4>
-                    <ul className="text-lg space-y-3">
-                      <li>
-                        • <strong>Correct answers</strong>: You are rewarded 2 <strong>probability points</strong>
-                      </li>
-                      <li>
-                        • <strong>Incorrect answers</strong>: You are NOT rewarded <strong>probability points</strong>
-                      </li>
-                      <li>
-                        • <strong>Unanswered/Skipped</strong>: You are rewarded 1 <strong>probability point</strong>
-                      </li>
-                    </ul>
-                  </div>
                 </div>
 
                 <div className="bg-red-100 border border-red-300 rounded-lg p-6">

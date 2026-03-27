@@ -28,7 +28,6 @@ export default function TrainingPhase1({ onNext, updateParticipantData, particip
   const [wantMorePractice, setWantMorePractice] = useState<boolean | null>(null)
   const [isExtraPractice, setIsExtraPractice] = useState(false)
   const [showTestsInfo, setShowTestsInfo] = useState(false)
-  const [showRewardScheme, setShowRewardScheme] = useState(false)
   const [allQuestions, setAllQuestions] = useState<Question[]>([])
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true)
   const [questionLoadError, setQuestionLoadError] = useState<string | null>(null)
@@ -250,8 +249,7 @@ export default function TrainingPhase1({ onNext, updateParticipantData, particip
     )
   }
 
-  // Show 3 tests info page
-  if (showTestsInfo && !showRewardScheme) {
+  if (showTestsInfo) {
     return (
       <div className="max-w-7xl mx-auto">
         <Card className="shadow-lg">
@@ -269,40 +267,7 @@ export default function TrainingPhase1({ onNext, updateParticipantData, particip
                 <li><strong>Please read instructions on each test carefully.</strong> It contains information <strong>very</strong> relevant for your performance.</li>
               </ol>
               <div className="mt-6 text-center">
-                <p className="text-lg text-blue-800 mb-4">Click next to see what rewards you can receive!</p>
-                <Button onClick={() => setShowRewardScheme(true)} size="lg" className="bg-blue-600 hover:bg-blue-700">
-                  Next
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  // Show reward scheme page
-  if (showRewardScheme) {
-    return (
-      <div className="max-w-7xl mx-auto">
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Target className="h-6 w-6 mr-2 text-green-600" />
-              Reward Scheme
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-8">
-              <h3 className="text-2xl font-semibold text-green-800 mb-6">You have a chance to win [x] dollar prize!</h3>
-              <ol className="text-lg text-green-700 space-y-4 list-decimal list-inside ml-4">
-                <li>Your scores on the tests will be converted to <strong>probability points</strong>.</li>
-                <li>Every probability point you gain means an additional probability point of winning the prize.</li>
-              </ol>
-              <div className="mt-6 text-center">
-                <p className="text-lg text-green-800 mb-4">Click next to move to test 1.</p>
-                <Button onClick={handleComplete} size="lg" className="bg-green-600 hover:bg-green-700">
+                <Button onClick={handleComplete} size="lg" className="bg-blue-600 hover:bg-blue-700">
                   Next
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>

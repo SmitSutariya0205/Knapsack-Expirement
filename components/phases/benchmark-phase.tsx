@@ -365,22 +365,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
                     </ul>
                   </div>
 
-                  <div className="bg-white p-6 rounded-lg">
-                    <h4 className="text-xl font-semibold mb-4">🎯 Assessment</h4>
-                    <ul className="text-lg space-y-3">
-                      <li>
-                        • <strong>Correct answers</strong>: You are rewarded 2 <strong>probability points</strong>
-                      </li>
-                      <li>
-                        • <strong>Incorrect answers</strong>: You are NOT rewarded <strong>probability points</strong>
-                      </li>
-                      <li>
-                        • <strong>Unanswered questions</strong>: You are rewarded 1 <strong>probability point</strong>
-                      </li>
-                      <li>• <strong>Must confirm answers to count</strong></li>
-                    </ul>
-                  </div>
-                </div>
+                                </div>
 
                 <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-6">
                   <p className="text-xl text-yellow-800 font-medium">
