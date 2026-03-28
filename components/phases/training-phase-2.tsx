@@ -152,12 +152,16 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
         totalQuestions: skillsQuestions.length,
         accuracy: correctCount / skillsQuestions.length,
         timeUsed: 15 * 60 - totalTimeLeft,
-        answers,
+        answers: answers.map(answer => ({
+          ...answer,
+          difficulty: skillsQuestions.find(q => q.id === answer.questionId)?.difficulty || 'unknown'
+        })),
         questionTimes: answers.map(answer => ({
           questionId: answer.questionId,
-          startTime: 0, // Will be populated by actual timing
+          startTime: 0,
           endTime: 0,
-          timeSpent: answer.timeSpent
+          timeSpent: answer.timeSpent,
+          difficulty: skillsQuestions.find(q => q.id === answer.questionId)?.difficulty || 'unknown'
         }))
       },
     }

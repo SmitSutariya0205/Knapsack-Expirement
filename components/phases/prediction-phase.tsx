@@ -205,13 +205,15 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
           selected: value.selected,
           confirmed: value.confirmed,
           correct: value.correct,
-          timeSpent: value.timeSpent || questionTimes[Number(questionId)]?.timeSpent || 0
+          timeSpent: value.timeSpent || questionTimes[Number(questionId)]?.timeSpent || 0,
+          difficulty: questions.find(q => q.id === Number(questionId))?.difficulty || 'unknown'
         })),
         questionTimes: Object.entries(questionTimes).map(([questionId, timing]) => ({
           questionId: Number(questionId),
           startTime: timing.startTime,
           endTime: timing.endTime,
-          timeSpent: timing.timeSpent || 0
+          timeSpent: timing.timeSpent || 0,
+          difficulty: questions.find(q => q.id === Number(questionId))?.difficulty || 'unknown'
         }))
       },
     }

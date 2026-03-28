@@ -136,13 +136,15 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
           selected: a.selected,
           correct: a.correct,
           confirmed: a.confirmed,
-          timeSpent: a.timeSpent || finalQuestionTimes[Number(questionId)]?.timeSpent || 0
+          timeSpent: a.timeSpent || finalQuestionTimes[Number(questionId)]?.timeSpent || 0,
+          difficulty: questions.find(q => q.id === Number(questionId))?.difficulty || 'unknown'
         })),
         questionTimes: Object.entries(finalQuestionTimes).map(([questionId, timing]) => ({
           questionId: Number(questionId),
           startTime: timing.startTime,
           endTime: timing.endTime,
-          timeSpent: timing.timeSpent || 0
+          timeSpent: timing.timeSpent || 0,
+          difficulty: questions.find(q => q.id === Number(questionId))?.difficulty || 'unknown'
         }))
       }
     }
