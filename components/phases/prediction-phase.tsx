@@ -358,6 +358,15 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
                       <li>• As before, <strong>please remember to confirm questions you wish to answer</strong>. You cannot change your answer after confirming, but you can still view them by moving to the question.</li>
                     </ul>
                   </div>
+
+                  <div className="bg-white p-6 rounded-lg text-gray-800">
+                    <h4 className="text-xl font-semibold mb-4">🎯 Scoring</h4>
+                    <ul className="text-lg space-y-3">
+                      <li>• <strong>Correct answers</strong>: 2 points</li>
+                      <li>• <strong>Incorrect answers</strong>: 0 points</li>
+                      <li>• <strong>Unanswered questions</strong>: 1 point</li>
+                    </ul>
+                  </div>
                 </div>
 
                 <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-6">
