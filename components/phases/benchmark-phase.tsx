@@ -27,7 +27,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
   }>({})
   const [starredQuestions, setStarredQuestions] = useState<Set<number>>(new Set())
   const [showInstructions, setShowInstructions] = useState(true)
-  const [timeLeft, setTimeLeft] = useState(15 * 60) // 15 minutes
+  const [timeLeft, setTimeLeft] = useState(10 * 60) // 10 minutes
   const [isComplete, setIsComplete] = useState(false)
   const timeTracker = useTimeTracker()
   const [showFinishWarning, setShowFinishWarning] = useState(false)
@@ -130,7 +130,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
         maxPoints,
         totalQuestions: questions.length,
         accuracy: correctAnswers / questions.length,
-        timeUsed: 15 * 60 - timeLeft,
+        timeUsed: 10 * 60 - timeLeft,
         answers: Object.entries(answers).map(([questionId, a]) => ({
           questionId: Number(questionId),
           selected: a.selected,

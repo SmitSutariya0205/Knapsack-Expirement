@@ -29,7 +29,7 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
   }>({})
   const [starredQuestions, setStarredQuestions] = useState<Set<number>>(new Set())
   const [showInstructions, setShowInstructions] = useState(true)
-  const [timeLeft, setTimeLeft] = useState(15 * 60) // 15 minutes
+  const [timeLeft, setTimeLeft] = useState(10 * 60) // 10 minutes
   const [isComplete, setIsComplete] = useState(false)
   const [showFinishWarning, setShowFinishWarning] = useState(false)
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true)
@@ -199,7 +199,7 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
         maxPoints,
         totalQuestions: questions.length,
         accuracy: correctAnswers / questions.length,
-        timeUsed: 20 * 60 - timeLeft,
+        timeUsed: 10 * 60 - timeLeft,
         answers: Object.entries(answers).map(([questionId, value]) => ({
           questionId: Number(questionId),
           selected: value.selected,
