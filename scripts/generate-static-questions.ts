@@ -134,7 +134,7 @@ function itemDominates(item1: Ball, item2: Ball): boolean {
  * 
  * Hard: B_k ⊁ B_j for all k, j (no dominance relationships exist)
  */
-function classifyDifficultyByDominance(balls: Ball[]): 'easy' | 'medium' | 'hard' {
+function classifyDifficultyByDominance(balls: Ball[]): 'easy' | 'medium' | 'hard' | 'invalid' {
   if (balls.length < 2) {
     return 'easy' // Single ball is trivially easy
   }
@@ -218,8 +218,8 @@ function classifyDifficultyByDominance(balls: Ball[]): 'easy' | 'medium' | 'hard
     return 'medium'
   }
 
-  // Default to hard if we can't classify as easy or medium
-  return 'hard'
+  // Default to invalid if we can't classify as strictly easy, medium, or hard
+  return 'invalid'
 }
 
 /**
@@ -350,6 +350,18 @@ function createDominancePattern(
           color: BALL_COLORS[i % BALL_COLORS.length]
         });
       }
+      
+      // Shuffle the order so they aren't strictly increasing
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = rng.range(0, i);
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+
+      // Reassign IDs and colors after shuffle
+      items.forEach((ball, idx) => {
+        ball.id = idx + 1;
+        ball.color = BALL_COLORS[idx % BALL_COLORS.length];
+      });
       break;
 
     case 'partial':
@@ -419,13 +431,47 @@ function createDominancePattern(
       break;
 
     case 'none':
-      for (let i = 0; i < NUM_BALLS; i++) {
-        items.push({
-          id: i + 1,
-          weight: rng.range(config.minWeight, config.maxWeight),
-          reward: rng.range(config.minReward, config.maxReward),
-          color: BALL_COLORS[i % BALL_COLORS.length]
+      {
+        const weights: number[] = [];
+        const rewards: number[] = [];
+        for (let i = 0; i < NUM_BALLS; i++) {
+          weights.push(rng.range(config.minWeight, config.maxWeight));
+          rewards.push(rng.range(config.minReward, config.maxReward));
+        }
+        
+        // Sort both arrays to enforce strict monotonic relationship
+        weights.sort((a, b) => a - b);
+        rewards.sort((a, b) => a - b);
+        
+        // Ensure strictly increasing internally
+        for (let i = 1; i < NUM_BALLS; i++) {
+          if (weights[i] <= weights[i - 1]) weights[i] = weights[i - 1] + 1;
+          if (rewards[i] <= rewards[i - 1]) rewards[i] = rewards[i - 1] + 1;
+        }
+
+        const hardBalls: Ball[] = [];
+        for (let i = 0; i < NUM_BALLS; i++) {
+          hardBalls.push({
+            id: i + 1,
+            weight: weights[i],
+            reward: rewards[i],
+            color: BALL_COLORS[i % BALL_COLORS.length]
+          });
+        }
+        
+        // Shuffle the order so monotonic progression isn't obvious
+        for (let i = hardBalls.length - 1; i > 0; i--) {
+          const j = rng.range(0, i);
+          [hardBalls[i], hardBalls[j]] = [hardBalls[j], hardBalls[i]];
+        }
+
+        // Reassign IDs and colors after shuffle
+        hardBalls.forEach((ball, idx) => {
+          ball.id = idx + 1;
+          ball.color = BALL_COLORS[idx % BALL_COLORS.length];
         });
+
+        items.push(...hardBalls);
       }
       break;
   }
