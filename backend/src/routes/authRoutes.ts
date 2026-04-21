@@ -105,3 +105,31 @@ router.post('/auth/verify-code', async (req, res) => {
         return res.status(500).json({ error: 'Verification failed' });
     }
 });
+
+// POST /auth/demo-login
+router.post('/auth/demo-login', async (req, res) => {
+    try {
+        const demoId = `demo_${crypto.randomInt(1000, 9999)}_${Date.now()}`;
+        const email = `${demoId}@demo.local`;
+
+        const participant = await prisma.participant.create({
+            data: {
+                participantId: demoId,
+                email,
+                prolificPid: demoId,
+                createdAt: new Date(),
+                registeredAt: new Date(),
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            participantId: participant.participantId,
+            email: participant.email
+        });
+    } catch (error) {
+        console.error('[AUTH ERROR] demo-login:', error);
+        return res.status(500).json({ error: 'Demo login failed' });
+    }
+});
+
