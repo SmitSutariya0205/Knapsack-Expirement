@@ -338,7 +338,7 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
               <div className="space-y-6 text-red-700">
                 <p className="text-xl">
                   You will complete a final test with <strong>{questions.length} dynamically generated knapsack questions</strong>. You
-                  have exactly <strong>15 minutes</strong> to complete the test.
+                  have exactly <strong>10 minutes</strong> to complete the test.
                 </p>
 
                 {questionLoadError && (

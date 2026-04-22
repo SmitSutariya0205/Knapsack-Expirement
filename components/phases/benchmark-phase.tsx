@@ -346,7 +346,7 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
               <div className="space-y-6 text-purple-700">
                 <p className="text-xl">
                   You will complete a test with <strong>30 dynamically generated knapsack questions</strong>. You
-                  have exactly <strong>15 minutes</strong> to complete the test.
+                  have exactly <strong>10 minutes</strong> to complete the test.
                 </p>
 
                 {questionLoadError && (
