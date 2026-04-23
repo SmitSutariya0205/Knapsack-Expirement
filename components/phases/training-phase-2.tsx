@@ -28,8 +28,8 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
   const [showInstructions, setShowInstructions] = useState(true)
   const timeTracker = useTimeTracker()
   const [startTime, setStartTime] = useState<number>(0)
-  const [totalTimeLeft, setTotalTimeLeft] = useState(15 * 60)
-  const [questionStartTime, setQuestionStartTime] = useState<number>(0)
+  const [totalTimeLeft, setTotalTimeLeft] = useState(10 * 60)
+  const [questionStartTimes, setQuestionStartTimes] = useState<{ [id: number]: number }>({})
   const [isComplete, setIsComplete] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const hasCompleted = useRef(false)
@@ -60,8 +60,12 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
 
   const nextQuestion = () => {
     if (currentQuestion < skillsQuestions.length - 1) {
-      setCurrentQuestion((prev) => prev + 1)
-      setQuestionStartTime(Date.now())
+      const nextIdx = currentQuestion + 1
+      const nextId = skillsQuestions[nextIdx]?.id
+      if (nextId) {
+        setQuestionStartTimes(prev => ({ ...prev, [nextId]: Date.now() }))
+      }
+      setCurrentQuestion(nextIdx)
     } else {
       completePhase()
     }
@@ -71,8 +75,9 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
     if (hasCompleted.current) return
 
     const endTime = Date.now()
-    const timeSpent = endTime - questionStartTime
     const questionId = skillsQuestions[currentQuestion].id
+    const startTime = questionStartTimes[questionId] || endTime
+    const timeSpent = endTime - startTime
 
     // Log interaction
     timeTracker.logInteraction('answer_confirmed', {
@@ -98,12 +103,15 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
   const skipQuestion = () => {
     if (hasCompleted.current) return
 
-    const timeSpent = Date.now() - questionStartTime
+    const questionId = skillsQuestions[currentQuestion].id
+    const now = Date.now()
+    const startTs = questionStartTimes[questionId] || now
+    const timeSpent = now - startTs
     const newAnswer = {
-      questionId: skillsQuestions[currentQuestion].id,
+      questionId,
       selected: [],
       correct: false,
-      confirmed: false, // User skipped this question
+      confirmed: false,
       timeSpent: Math.round(timeSpent / 1000),
     }
 
@@ -151,18 +159,21 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
         maxPoints,
         totalQuestions: skillsQuestions.length,
         accuracy: correctCount / skillsQuestions.length,
-        timeUsed: 15 * 60 - totalTimeLeft,
+        timeUsed: 10 * 60 - totalTimeLeft,
         answers: answers.map(answer => ({
           ...answer,
           difficulty: skillsQuestions.find(q => q.id === answer.questionId)?.difficulty || 'unknown'
         })),
-        questionTimes: answers.map(answer => ({
-          questionId: answer.questionId,
-          startTime: 0,
-          endTime: 0,
-          timeSpent: answer.timeSpent,
-          difficulty: skillsQuestions.find(q => q.id === answer.questionId)?.difficulty || 'unknown'
-        }))
+        questionTimes: answers.map(answer => {
+          const startTs = questionStartTimes[answer.questionId] || 0
+          return {
+            questionId: answer.questionId,
+            startTime: startTs,
+            endTime: startTs + answer.timeSpent,
+            timeSpent: answer.timeSpent,
+            difficulty: skillsQuestions.find(q => q.id === answer.questionId)?.difficulty || 'unknown'
+          }
+        })
       },
     }
 
@@ -204,7 +215,11 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
   const startPhase = () => {
     setShowInstructions(false)
     setStartTime(Date.now())
-    setQuestionStartTime(Date.now())
+    // Seed the start time for question 0
+    const firstId = skillsQuestions[0]?.id
+    if (firstId) {
+      setQuestionStartTimes({ [firstId]: Date.now() })
+    }
   }
 
   const formatTime = (seconds: number) => {
@@ -411,13 +426,14 @@ export default function TrainingPhase2({ onNext, updateParticipantData, particip
             isTestMode={true}
             timeLimit={90}
             onTimeUp={() => {
-              const timeSpent = Date.now() - questionStartTime
+              const now = Date.now()
+              const startTs = questionStartTimes[question.id] || now
               const newAnswer = {
                 questionId: question.id,
                 selected: [],
                 correct: false,
-                confirmed: false, // Per-question timer expired
-                timeSpent: Math.round(timeSpent / 1000),
+                confirmed: false,
+                timeSpent: Math.round((now - startTs) / 1000),
               }
               setAnswers((prev) => [...prev, newAnswer])
               nextQuestion()

@@ -35,6 +35,15 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
   const [currentQuestionStartTime, setCurrentQuestionStartTime] = useState<number | null>(null)
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true)
   const [questionLoadError, setQuestionLoadError] = useState<string | null>(null)
+  // Navigation log: records every question visit in sequence order
+  const [navigationLog, setNavigationLog] = useState<Array<{
+    visitIndex: number      // 1st visit = 0, 2nd visit = 1, etc.
+    questionId: number      // ID of the question visited
+    questionIndex: number   // Position in the question list (0-based)
+    arrivedAt: number       // Unix timestamp (ms) when participant arrived
+    leftAt?: number         // Unix timestamp (ms) when participant left
+    dwellMs?: number        // Time spent on this visit (ms)
+  }>>([])
 
 
   // API base
@@ -118,6 +127,18 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
       }
     }
 
+    // Close last open navigation log entry
+    const finalNavLog = [...navigationLog]
+    const lastNav = finalNavLog[finalNavLog.length - 1]
+    const completionTime = Date.now()
+    if (lastNav && lastNav.leftAt === undefined) {
+      finalNavLog[finalNavLog.length - 1] = {
+        ...lastNav,
+        leftAt: completionTime,
+        dwellMs: completionTime - lastNav.arrivedAt
+      }
+    }
+
     const payload = {
       phase: "benchmark",
       participantId,
@@ -145,7 +166,10 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
           endTime: timing.endTime,
           timeSpent: timing.timeSpent || 0,
           difficulty: questions.find(q => q.id === Number(questionId))?.difficulty || 'unknown'
-        }))
+        })),
+        // NavigationLog: full sequence of question visits in chronological order
+        // Use this to reconstruct attempt ordering and dwell times per visit
+        navigationLog: finalNavLog
       }
     }
 
@@ -178,48 +202,30 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
     }
   }
 
-  // Track question timing when current question changes
+  // Track question timing when test starts (first question only — subsequent
+  // navigation is handled by navigateToQuestion)
   useEffect(() => {
     if (!showInstructions && questions.length > 0 && !isComplete) {
-      const questionId = questions[currentQuestion]?.id
-      if (questionId) {
-        // End timing for previous question
-        if (currentQuestionStartTime !== null) {
-          const prevQuestionId = questions[currentQuestion - 1]?.id
-          if (prevQuestionId) {
-            const endTime = Date.now()
-            const timeSpent = endTime - currentQuestionStartTime
-            setQuestionTimes(prev => ({
-              ...prev,
-              [prevQuestionId]: {
-                ...prev[prevQuestionId],
-                endTime,
-                timeSpent
-              }
-            }))
-          }
-        }
-
-        // Start timing for current question
+      const questionId = questions[0]?.id
+      if (questionId && navigationLog.length === 0) {
         const startTime = Date.now()
         setCurrentQuestionStartTime(startTime)
         setQuestionTimes(prev => ({
           ...prev,
-          [questionId]: {
-            startTime,
-            endTime: undefined,
-            timeSpent: undefined
-          }
+          [questionId]: { startTime, endTime: undefined, timeSpent: undefined }
         }))
-
+        // Seed the navigation log with the first question
+        setNavigationLog([{
+          visitIndex: 0,
+          questionId,
+          questionIndex: 0,
+          arrivedAt: startTime,
+        }])
         timeTracker.startQuestion(questionId, 'benchmark')
       }
-
-      return () => {
-        timeTracker.endQuestion()
-      }
     }
-  }, [currentQuestion, showInstructions, questions, isComplete, timeTracker])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showInstructions, questions])
 
   const handleAnswer = (selectedBalls: number[], isCorrect: boolean) => {
     const questionId = questions[currentQuestion].id
@@ -264,27 +270,53 @@ export default function BenchmarkPhase({ onNext, updateParticipantData, particip
   }
 
   const navigateToQuestion = (index: number) => {
-    // Record time for current question before navigating
+    const now = Date.now()
+
+    // Close out the current question's navigation log entry
     if (currentQuestionStartTime !== null && questions[currentQuestion]) {
       const currentQuestionId = questions[currentQuestion].id
-      const endTime = Date.now()
-      const timeSpent = endTime - currentQuestionStartTime
+      const dwellMs = now - currentQuestionStartTime
+
+      // Update questionTimes
       setQuestionTimes(prev => ({
         ...prev,
         [currentQuestionId]: {
           ...prev[currentQuestionId],
-          endTime,
-          timeSpent
+          endTime: now,
+          timeSpent: dwellMs
         }
       }))
+
+      // Close the last open navigation log entry
+      setNavigationLog(prev => {
+        const updated = [...prev]
+        const lastEntry = updated[updated.length - 1]
+        if (lastEntry && lastEntry.leftAt === undefined) {
+          updated[updated.length - 1] = { ...lastEntry, leftAt: now, dwellMs }
+        }
+        return updated
+      })
     }
 
-    // Log navigation interaction
+    // Open a new navigation log entry for the destination question
+    if (questions[index]) {
+      setNavigationLog(prev => [
+        ...prev,
+        {
+          visitIndex: prev.length,
+          questionId: questions[index].id,
+          questionIndex: index,
+          arrivedAt: now,
+        }
+      ])
+    }
+
+    // Log interaction (decorative — time-tracker is no-op)
     timeTracker.logInteraction('question_navigation', {
       fromQuestion: currentQuestion,
       toQuestion: index,
-      timeSpent: currentQuestionStartTime ? Date.now() - currentQuestionStartTime : 0,
-      timestamp: new Date().toISOString()
+      timeSpent: currentQuestionStartTime ? now - currentQuestionStartTime : 0,
+      timestamp: new Date(now).toISOString()
     })
 
     setCurrentQuestion(index)

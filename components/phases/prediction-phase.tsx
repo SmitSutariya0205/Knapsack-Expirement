@@ -38,75 +38,46 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
   const timeTracker = useTimeTracker()
   const [questionTimes, setQuestionTimes] = useState<{ [key: number]: { startTime: number, endTime?: number, timeSpent?: number } }>({})
   const [currentQuestionStartTime, setCurrentQuestionStartTime] = useState<number | null>(null)
+  // Navigation log: records every question visit in sequence order
+  const [navigationLog, setNavigationLog] = useState<Array<{
+    visitIndex: number      // Chronological visit counter (0 = first visit)
+    questionId: number      // ID of the question visited
+    questionIndex: number   // Position in the question list (0-based)
+    arrivedAt: number       // Unix timestamp (ms) when participant arrived
+    leftAt?: number         // Unix timestamp (ms) when participant left
+    dwellMs?: number        // Time spent on this visit (ms)
+  }>>([])
 
   // API base (configure in .env.local as NEXT_PUBLIC_API_BASE=http://localhost:8787)
   const API_BASE = useMemo(() => process.env.NEXT_PUBLIC_API_BASE || "https://knapsack-expirement-3f13.onrender.com", [])
 
-  // Start section timing when phase begins
+  // Track question timing when phase starts (first question only)
   useEffect(() => {
     if (!showInstructions && questions.length > 0) {
       timeTracker.startSection('final')
-
-      // Start timing for first question
-      const questionId = questions[currentQuestion]?.id
-      if (questionId) {
+      const questionId = questions[0]?.id
+      if (questionId && navigationLog.length === 0) {
         const startTime = Date.now()
         setCurrentQuestionStartTime(startTime)
         setQuestionTimes(prev => ({
           ...prev,
-          [questionId]: {
-            startTime,
-            endTime: undefined,
-            timeSpent: undefined
-          }
+          [questionId]: { startTime, endTime: undefined, timeSpent: undefined }
         }))
+        // Seed the navigation log with the first question
+        setNavigationLog([{
+          visitIndex: 0,
+          questionId,
+          questionIndex: 0,
+          arrivedAt: startTime,
+        }])
         timeTracker.startQuestion(questionId, 'final')
       }
     }
+    return () => { timeTracker.endSection() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showInstructions, questions])
 
-    return () => {
-      timeTracker.endSection()
-    }
-  }, [showInstructions, questions, timeTracker, currentQuestion])
-
-  // Track question timing when current question changes
-  useEffect(() => {
-    if (!showInstructions && questions.length > 0 && !isComplete) {
-      const questionId = questions[currentQuestion]?.id
-      if (questionId) {
-        // End timing for previous question
-        if (currentQuestionStartTime !== null) {
-          const prevQuestionId = questions[currentQuestion - 1]?.id
-          if (prevQuestionId) {
-            const endTime = Date.now()
-            const timeSpent = endTime - currentQuestionStartTime
-            setQuestionTimes(prev => ({
-              ...prev,
-              [prevQuestionId]: {
-                ...prev[prevQuestionId],
-                endTime,
-                timeSpent
-              }
-            }))
-          }
-        }
-
-        // Start timing for current question
-        const startTime = Date.now()
-        setCurrentQuestionStartTime(startTime)
-        setQuestionTimes(prev => ({
-          ...prev,
-          [questionId]: {
-            startTime,
-            endTime: undefined,
-            timeSpent: undefined
-          }
-        }))
-
-        timeTracker.startQuestion(questionId, 'final')
-      }
-    }
-  }, [currentQuestion, showInstructions, questions, isComplete, timeTracker])
+  // (Question timing on navigation changes is now handled inside navigateToQuestion)
 
 
 
@@ -183,9 +154,20 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
     const confirmedAnswers = Object.values(answers).filter((a) => a.confirmed).length
     const unansweredQuestions = questions.length - confirmedAnswers
 
-    // Calculate points: 2 points per correct, 1 point per unanswered, 0 per incorrect
     const totalPoints = (correctAnswers * 2) + (unansweredQuestions * 1) + (incorrectAnswers * 0)
-    const maxPoints = questions.length * 2 // 30 questions × 2 = 60 max points
+    const maxPoints = questions.length * 2
+
+    // Close last open navigation log entry
+    const finalNavLog = [...navigationLog]
+    const lastNav = finalNavLog[finalNavLog.length - 1]
+    const completionTime = Date.now()
+    if (lastNav && lastNav.leftAt === undefined) {
+      finalNavLog[finalNavLog.length - 1] = {
+        ...lastNav,
+        leftAt: completionTime,
+        dwellMs: completionTime - lastNav.arrivedAt
+      }
+    }
 
     const payload = {
       participantId,
@@ -214,7 +196,9 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
           endTime: timing.endTime,
           timeSpent: timing.timeSpent || 0,
           difficulty: questions.find(q => q.id === Number(questionId))?.difficulty || 'unknown'
-        }))
+        })),
+        // NavigationLog: full sequence of question visits in chronological order
+        navigationLog: finalNavLog
       },
     }
 
@@ -252,27 +236,52 @@ export default function PredictionPhase({ onNext, updateParticipantData, partici
   }
 
   const navigateToQuestion = (index: number) => {
-    // Record time for current question before navigating
+    const now = Date.now()
+
+    // Close out the current question's navigation log entry
     if (currentQuestionStartTime !== null && questions[currentQuestion]) {
       const currentQuestionId = questions[currentQuestion].id
-      const endTime = Date.now()
-      const timeSpent = endTime - currentQuestionStartTime
+      const dwellMs = now - currentQuestionStartTime
+
       setQuestionTimes(prev => ({
         ...prev,
         [currentQuestionId]: {
           ...prev[currentQuestionId],
-          endTime,
-          timeSpent
+          endTime: now,
+          timeSpent: dwellMs
         }
       }))
+
+      // Close the last open navigation log entry
+      setNavigationLog(prev => {
+        const updated = [...prev]
+        const lastEntry = updated[updated.length - 1]
+        if (lastEntry && lastEntry.leftAt === undefined) {
+          updated[updated.length - 1] = { ...lastEntry, leftAt: now, dwellMs }
+        }
+        return updated
+      })
     }
 
-    // Log navigation interaction
+    // Open a new navigation log entry for the destination question
+    if (questions[index]) {
+      setNavigationLog(prev => [
+        ...prev,
+        {
+          visitIndex: prev.length,
+          questionId: questions[index].id,
+          questionIndex: index,
+          arrivedAt: now,
+        }
+      ])
+    }
+
+    // Log interaction (decorative — time-tracker is no-op)
     timeTracker.logInteraction('question_navigation', {
       fromQuestion: currentQuestion,
       toQuestion: index,
-      timeSpent: currentQuestionStartTime ? Date.now() - currentQuestionStartTime : 0,
-      timestamp: new Date().toISOString()
+      timeSpent: currentQuestionStartTime ? now - currentQuestionStartTime : 0,
+      timestamp: new Date(now).toISOString()
     })
 
     setCurrentQuestion(index)
